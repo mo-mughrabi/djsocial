@@ -92,7 +92,7 @@ class Operation(models.Model):
         #user = api.me()
         try:
             args = self.args.split(',')
-        except :
+        except:
             # handle if args is a single argument or none
             raise
         if self.func == 'follow_user':

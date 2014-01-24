@@ -92,10 +92,12 @@ def social_extra_data(backend, details, response, social_user, uid, user, *args,
     if social_user.provider == 'twitter':
         """ populate extra data for twitter users """
         from apps.twitter.models import Twitter
+
         try:
             twitter = Twitter.objects.get(user=user)
         except Twitter.DoesNotExist:
             import urlparse
+
             tokens = urlparse.parse_qs(response.get('access_token'))
             Twitter.objects.create(
                 user=user,
@@ -119,7 +121,8 @@ def update_email_validity(backend, details, response, user=None, is_new=False, *
     if not confirmation_record:
         user.create_email_confirmation(trigger_email=False)
 
-    if social_user.provider in ('facebook', 'linkedin') and details.get('email') and is_new is False and email_is_valid is False:
+    if social_user.provider in ('facebook', 'linkedin') and details.get(
+            'email') and is_new is False and email_is_valid is False:
         if details.get('email') == user.email:
             obj = EmailConfirmation.objects.get(user=user)
             obj.email_is_valid = True

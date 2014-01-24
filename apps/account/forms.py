@@ -35,7 +35,6 @@ class EditProfileForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-
         if 'request' in kwargs:
             self.request = kwargs.get('request')
             kwargs.pop('request')
@@ -65,8 +64,8 @@ class SocialForm(forms.Form):
     email = forms.EmailField(
         widget=forms.TextInput(attrs={'class': 'input-xlarge', 'placeholder': 'Email address...', 'required': ''}))
     join_mailing_list = forms.BooleanField(required=False, widget=forms.CheckboxInput(
-                                    attrs={'tabindex': '4', 'class': 'field login-checkbox'}),
-                                    label=_('Join a mailing list for your interests'))
+        attrs={'tabindex': '4', 'class': 'field login-checkbox'}),
+                                           label=_('Join a mailing list for your interests'))
     terms = forms.BooleanField(widget=forms.CheckboxInput(attrs={'tabindex': '4', 'class': 'field login-checkbox'}),
                                label=_('I have read and agree with the Terms of Use.'),
                                error_messages={'required': _('Your must agree for the terms and conditions')})

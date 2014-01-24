@@ -16,7 +16,7 @@ import time
 logger = get_task_logger(__name__)
 
 
-def get_diff(list1,list2):
+def get_diff(list1, list2):
     """Outputs objects which are in list1 but not list 2"""
     return list(set(list1).difference(set(list2)))
 
@@ -38,47 +38,48 @@ def run_operations():
 
 @task()
 def follow_back(account_id):
-        auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-        account = Twitter.objects.get(pk=account_id)
-        auth.set_access_token(account.access_token, account.secret_key)
-        api = tweepy.API(auth)
-        #user = api.me()
+    auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
+    account = Twitter.objects.get(pk=account_id)
+    auth.set_access_token(account.access_token, account.secret_key)
+    api = tweepy.API(auth)
+    #user = api.me()
 
-        follower_ids = []
-        for follower in tweepy.Cursor(api.followers).items():
-            follower_ids.append(follower.id)
+    follower_ids = []
+    for follower in tweepy.Cursor(api.followers).items():
+        follower_ids.append(follower.id)
 
-        friend_ids = []
-        for friend in tweepy.Cursor(api.friends).items():
-            friend_ids.append(friend.id)
+    friend_ids = []
+    for friend in tweepy.Cursor(api.friends).items():
+        friend_ids.append(friend.id)
 
-        follow_list = get_diff(follower_ids, friend_ids)
+    follow_list = get_diff(follower_ids, friend_ids)
 
-        for follower in follow_list:
-            Operation.objects.create(user=account, func='follow_user', args='{},'.format(follower))
-        return u'Success'
+    for follower in follow_list:
+        Operation.objects.create(user=account, func='follow_user', args='{},'.format(follower))
+    return u'Success'
+
 
 @task()
 def unfollow(account_id):
-        auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-        account = Twitter.objects.get(pk=account_id)
-        auth.set_access_token(account.access_token, account.secret_key)
-        api = tweepy.API(auth)
-        #user = api.me()
+    auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
+    account = Twitter.objects.get(pk=account_id)
+    auth.set_access_token(account.access_token, account.secret_key)
+    api = tweepy.API(auth)
+    #user = api.me()
 
-        follower_ids = []
-        for follower in tweepy.Cursor(api.followers).items():
-            follower_ids.append(follower.id)
+    follower_ids = []
+    for follower in tweepy.Cursor(api.followers).items():
+        follower_ids.append(follower.id)
 
-        friend_ids = []
-        for friend in tweepy.Cursor(api.friends).items():
-            friend_ids.append(friend.id)
+    friend_ids = []
+    for friend in tweepy.Cursor(api.friends).items():
+        friend_ids.append(friend.id)
 
-        unfollow_list = get_diff(friend_ids, follower_ids)
+    unfollow_list = get_diff(friend_ids, follower_ids)
 
-        for follower in unfollow_list:
-            Operation.objects.create(user=account, func='unfollow_user', args='{},'.format(follower))
-        return u'Success'
+    for follower in unfollow_list:
+        Operation.objects.create(user=account, func='unfollow_user', args='{},'.format(follower))
+    return u'Success'
 
 
 @periodic_task(run_every=crontab(minute="*/5"))
