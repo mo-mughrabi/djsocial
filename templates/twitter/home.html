@@ -1,43 +1,44 @@
 {# TODO: Build twitter index page, it should be a panel page where user can see a left navigation and center area #}
-{% extends "base.html" %}
+{% extends "twitter/base.html" %}
 
 {% block centraal_content %}
     <div class="container">
-    <div class="row">
-        <div class="col-md-2">
-            <ul class="nav nav-pills nav-stacked">
-                <li class="active"><a href="#">Left navigation 1</a></li>
-                <li><a href="#">Left navigation 2</a></li>
-                <li><a href="#">Left navigation 3</a></li>
-                <li><a href="#">Left navigation 4</a></li>
-                <li><a href="#">Left navigation 5</a></li>
-                <li><a href="#">Left navigation 6</a></li>
-                <li><a href="#">Left navigation 7</a></li>
-                <li><a href="#">Left navigation 8</a></li>
-                <li><a href="#">Left navigation 9</a></li>
-                <li><a href="#">Left navigation 10</a></li>
-                <li><a href="#">Left navigation 11</a></li>
-                <li><a data-toggle="tooltip" title="first tooltip" href="#">Left navigation 12</a></li>
-            </ul>
-        </div>
-        <a href="{% url 'twitter-hashtag' %}">go to hash tags</a>
-        <form method="POST">{% csrf_token %}
-        <div class="col-md-9">
-            <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                Following options<span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                <li>
-                    <input type="submit" name="form-type" value="Follow back">
-                </li>
-                <li>
-                    <input type="submit" name="form-type" value="Unfollow">
-                </li>
-              </ul>
+        <div class="row">
+            <div class="col-md-2">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active"><a href="#">Left navigation 1</a></li>
+                    <li><a href="#">Left navigation 2</a></li>
+                    <li><a href="#">Left navigation 3</a></li>
+                    <li><a href="#">Left navigation 4</a></li>
+                    <li><a href="#">Left navigation 5</a></li>
+                    <li><a href="#">Left navigation 6</a></li>
+                    <li><a href="#">Left navigation 7</a></li>
+                    <li><a href="#">Left navigation 8</a></li>
+                    <li><a href="#">Left navigation 9</a></li>
+                    <li><a href="#">Left navigation 10</a></li>
+                    <li><a href="#">Left navigation 11</a></li>
+                    <li><a data-toggle="tooltip" title="first tooltip" href="#">Left navigation 12</a></li>
+                </ul>
             </div>
+            <a href="{% url 'twitter-hashtag' %}">go to hash tags</a>
+
+            <form method="POST">{% csrf_token %}
+                <div class="col-md-9">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            Following options<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <input type="submit" name="form-type" value="Follow back">
+                            </li>
+                            <li>
+                                <input type="submit" name="form-type" value="Unfollow">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </form>
         </div>
-        </form>
-    </div>
     </div>
 {% endblock %}
