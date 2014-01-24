@@ -1,0 +1,118 @@
+{% load i18n %}<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="" />
+    <meta name="keywords" content="{% block keywords %}{% endblock %}" />
+    <meta name="author" content="Mo Mughrabi" />
+
+
+	<!-- CSS Styles & compressions starts here -->
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" />
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}carousel.css" />
+	<!-- CSS Styles & compressions ends here -->
+
+    <!-- JavaScript & compressions starts here -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}holder.js"></script>
+    {% block js %}{% endblock %}
+    <!-- JavaScript & compressions ends here -->
+
+	<title>{%block title %}Twitter bot{%endblock%}</title>
+</head>
+<body>
+    {% block navbar %}
+
+    <div class="navbar-wrapper">
+      <div class="container">
+
+        <div class="navbar navbar-inverse navbar-static-top">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="{% url 'account-signup' %}">{% trans 'Twit Robo' %}</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="#">{% trans 'Tour' %}</a></li>
+                <li><a href="#about">{% trans 'About' %}</a></li>
+                <li><a href="#contact">{% trans 'Contact me' %}</a></li>
+                <li><a href="#tell-a-friend">{% trans 'Tell friends' %}</a></li>
+              </ul>
+              <ul class="nav navbar-nav pull-right">
+
+                {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'account-profile' %}">{% trans 'Profile' %}</a></li>
+                    <li><a href="{% url 'twitter-home' %}">{% trans 'Twitter Robo' %}</a></li>
+                    <li><a href="{% url 'account-logout' %}">{% trans 'Sign out' %}</a></li>
+                {% else %}
+                    <li class="active"><a href="{% url 'account-signup' %}">{% trans 'Sign up' %}</a></li>
+                {% endif %}
+
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {% endblock %}
+
+    {% block carousel %}{% endblock %}
+
+    <div class="container {% block container_css %}{% endblock %}">
+        {% block centraal_content %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                    {% if message.tags == 'success' %}
+                        <div class="alert alert-info alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endblock %}
+
+        <hr />
+        <!-- FOOTER -->
+        <footer>
+            <p class="pull-right"><a href="#">{% trans 'Back to top' %}</a></p>
+            <p>&copy; {% trans 'Developed by' %} {% trans 'Mo Mughrabi' %}. &middot; <a href="#">{% trans 'Privacy' %}</a> &middot; <a href="#">{% trans 'Terms' %}</a></p>
+        </footer>
+
+    </div><!-- /.container -->
+
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-11286723-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+{% block sharethis %}{% endblock %}
+
+</body>
+</html>
