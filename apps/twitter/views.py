@@ -9,7 +9,7 @@ from pytz import utc
 from forms import HashtagForm
 from tasks import follow_back
 from tasks import unfollow
-from models import Account, Hashtag
+from models import Twitter, Hashtag
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
@@ -25,7 +25,7 @@ class Home(View):
 
     @method_decorator(login_required)
     def post(self, request):
-        account = Account.objects.get(user=request.user)
+        account = Twitter.objects.get(user=request.user)
         if request.POST['form-type'] == u'Follow back':
             follow_back.delay(account.id, )
         else:
@@ -64,7 +64,7 @@ class HashtagView(View):
         form = HashtagForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.created_user = get_object_or_404(Account, user=request.user)
+            obj.created_user = get_object_or_404(Twitter, user=request.user)
             obj.save()
             messages.success(request, 'Hash tag was saved successfully')
             return redirect(reverse('twitter-hashtag'))

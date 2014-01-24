@@ -299,32 +299,3 @@ class PasswordRecovery(models.Model):
         # Note use of django.utils.encoding.force_bytes() here because
         # first_name and last_name will be unicode strings.
         return force_bytes('%s' % self.user.username)
-
-
-class TwitterExtraManager(models.Manager):
-    """
-    """
-
-
-class TwitterExtra(models.Model):
-    """
-    accounts / twitter
-    """
-
-    user = models.OneToOneField(getattr(settings, 'AUTH_USER_MODEL'))
-    access_token = models.CharField(max_length=100, )
-    access_token_secret = models.CharField(max_length=100, )
-    screen_name = models.CharField(max_length=100, unique=True, )
-    link = models.URLField(null=True, blank=True, )
-    avatar = models.ImageField(null=True, blank=True, upload_to='accounts/avatar/twitter/')
-    response = models.TextField(null=True, blank=True)
-
-    objects = TwitterExtraManager()
-
-    def __unicode__(self):
-        return u'TwitterExtra - %s' % self.user.username
-
-    def __str__(self):
-        # Note use of django.utils.encoding.force_bytes() here because
-        # first_name and last_name will be unicode strings.
-        return force_bytes('TwitterExtra - %s' % self.user.username)

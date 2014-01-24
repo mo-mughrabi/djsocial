@@ -71,12 +71,11 @@ class Profile(View):
         form = EditProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.info(request,"Your profile has been successfully updated!")
+            messages.success(request, "Your profile has been successfully updated!")
         return render(request, self.template_name, {'form': form})
 
 
-
-class DeleteView(DeleteView):
+class DeleteProfileView(DeleteView):
     """
 
     """
@@ -87,7 +86,7 @@ class DeleteView(DeleteView):
         user = User.objects.get(pk=pk)
         return render(request, self.template_name, {
             'message': 'Are you sure you want to delete user %s' % user.username
-        },)
+        }, )
 
     def post(self, request, pk):
         user = User.objects.get(pk=pk)
@@ -96,12 +95,12 @@ class DeleteView(DeleteView):
         return redirect(reverse('home'))
 
 
-class CompleteProfile(View):
+class SocialRegister(View):
     """
 
     """
 
-    template_name = 'account/complete_profile.html'
+    template_name = 'account/social_register.html'
 
     def get(self, request):
         name = getattr(settings, 'SOCIAL_AUTH_PARTIAL_PIPELINE_KEY', 'partial_pipeline')
@@ -129,10 +128,10 @@ class CompleteProfile(View):
 
         form = SocialForm(initial=initial_context)
         return render(request, self.template_name,
-                {'form': form,
-                'backend': backend,
-                'username': username,
-                'avatar': avatar},)
+                      {'form': form,
+                       'backend': backend,
+                       'username': username,
+                       'avatar': avatar}, )
 
     def post(self, request):
         name = getattr(settings, 'SOCIAL_AUTH_PARTIAL_PIPELINE_KEY', 'partial_pipeline')
@@ -164,8 +163,8 @@ class CompleteProfile(View):
             return redirect('socialauth_complete', backend=backend)
 
         return render(request, self.template_name,
-                {'form': form,
-                'backend': backend,
-                'username': username,
-                'avatar': avatar},)
+                      {'form': form,
+                       'backend': backend,
+                       'username': username,
+                       'avatar': avatar}, )
 

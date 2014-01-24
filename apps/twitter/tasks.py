@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from celery.contrib.methods import task
 from celery import task
 from celery.schedules import crontab
 from celery.task import periodic_task
 import datetime
 from django.conf import settings
-from django.db import IntegrityError
-from django.db.models import get_model
 from celery.utils.log import get_task_logger
 from apps.twitter.models import Operation, Hashtag
-
-logger = get_task_logger(__name__)
 import tweepy
 from tweepy import OAuthHandler
-from models import Account
+from models import Twitter
 import time
+
+# setup logger
+logger = get_task_logger(__name__)
 
 
 def get_diff(list1,list2):
@@ -41,7 +39,7 @@ def run_operations():
 @task()
 def follow_back(account_id):
         auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-        account = Account.objects.get(pk=account_id)
+        account = Twitter.objects.get(pk=account_id)
         auth.set_access_token(account.access_token, account.secret_key)
         api = tweepy.API(auth)
         #user = api.me()
@@ -63,7 +61,7 @@ def follow_back(account_id):
 @task()
 def unfollow(account_id):
         auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-        account = Account.objects.get(pk=account_id)
+        account = Twitter.objects.get(pk=account_id)
         auth.set_access_token(account.access_token, account.secret_key)
         api = tweepy.API(auth)
         #user = api.me()

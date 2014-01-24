@@ -7,7 +7,7 @@ from tweepy import OAuthHandler
 import tweepy
 
 
-class Account(models.Model):
+class Twitter(models.Model):
     """
     """
     user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL'))
@@ -18,18 +18,21 @@ class Account(models.Model):
     followers_sum = models.PositiveIntegerField(default=0)
     following_sum = models.PositiveIntegerField(default=0)
 
+    def __unicode__(self):
+        return u'%s' % self.user
+
 
 class Follower(models.Model):
     """
     """
-    account = models.ForeignKey(Account, related_name='followers')
+    account = models.ForeignKey(Twitter, related_name='followers')
     screen_name = models.CharField(_('Screen name'), max_length=200)
 
 
 class Following(models.Model):
     """
     """
-    account = models.ForeignKey(Account, related_name='following')
+    account = models.ForeignKey(Twitter, related_name='following')
     screen_name = models.CharField(_('Screen name'), max_length=200)
 
 
@@ -54,7 +57,7 @@ class Hashtag(models.Model):
 
     hash_tag_key = models.SlugField()
     last_time_sync = models.DateTimeField(auto_now_add=True)
-    created_user = models.ForeignKey(Account, related_name='created_user')
+    created_user = models.ForeignKey(Twitter, related_name='created_user')
     number_retweet_or_favourite = models.IntegerField(default=0)
     retweet_or_favourite = models.CharField(_('Retweet or favourites'), max_length=10,
                                             choices=FUNCTIONS, default='R')
@@ -76,7 +79,7 @@ class Operation(models.Model):
     perform_at = models.DateTimeField(auto_now_add=True)
     performed_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=2, choices=STATUSES, default='P')
-    user = models.ForeignKey(Account)
+    user = models.ForeignKey(Twitter)
     func = models.CharField(max_length=200, choices=FUNCTIONS)
     args = models.CharField(max_length=100)
     kwargs = models.CharField(max_length=200, null=True, blank=True)

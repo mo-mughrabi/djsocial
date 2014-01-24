@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import logging
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.contrib import messages
@@ -11,7 +12,10 @@ from django.utils.translation import ugettext as _
 from social_auth.db.django_models import UserSocialAuth
 from social_auth.exceptions import AuthAlreadyAssociated
 from exceptions import AuthAccountSuspended
-from models import TwitterExtra, User, EmailConfirmation
+from models import User, EmailConfirmation
+
+# initiate logger
+logger = logging.getLogger('%s.%s.%s' % (getattr(settings, 'PACKAGE_NAMESPACE'), 'apps', __name__))
 
 
 def social_auth_user(backend, uid, user=None, *args, **kwargs):
@@ -42,7 +46,7 @@ def redirect_to_form(*args, **kwargs):
     """ """
     # new user
     if not kwargs['request'].session.get('saved_email') and kwargs.get('user') is None:
-        return HttpResponseRedirect(reverse('account-complete-profile'))
+        return HttpResponseRedirect(reverse('account-social-register'))
 
 
 def set_username(request, *args, **kwargs):
@@ -73,12 +77,12 @@ def set_user_details(request, *args, **kwargs):
             'protocol': 'https' if request.is_secure() else 'http',
             'STATIC_URL': getattr(settings, 'STATIC_URL')
         })
-        msg = EmailMultiAlternatives(_('Welcome to Twit Robo'), txt.render(c), 'info@twit-robo.mocorner.com',
+        msg = EmailMultiAlternatives(_('Welcome to djsocial'), txt.render(c), 'info@twit-robo.mocorner.com',
                                      [user.email, ])
         msg.attach_alternative(html.render(c), "text/html")
         # uncomment below to allow sending outgoing emails
         #msg.send()
-        messages.success(request, _('Welcome to Twitbot'))
+        messages.success(request, _('Welcome to djsocial'))
 
 
 def social_extra_data(backend, details, response, social_user, uid, user, *args, **kwargs):
@@ -87,17 +91,18 @@ def social_extra_data(backend, details, response, social_user, uid, user, *args,
 
     if social_user.provider == 'twitter':
         """ populate extra data for twitter users """
+        from apps.twitter.models import Twitter
         try:
-            tw_user = TwitterExtra.objects.get(user=user)
-        except TwitterExtra.DoesNotExist:
+            twitter = Twitter.objects.get(user=user)
+        except Twitter.DoesNotExist:
             import urlparse
             tokens = urlparse.parse_qs(response.get('access_token'))
-            TwitterExtra.objects.create(
+            Twitter.objects.create(
                 user=user,
-                access_token=tokens['oauth_token'][0],
-                access_token_secret=tokens['oauth_token_secret'][0],
+                tid='',
                 screen_name=response.get('screen_name'),
-                response=response,
+                access_token=tokens['oauth_token'][0],
+                secret_key=tokens['oauth_token_secret'][0]
             )
 
 
@@ -133,9 +138,3 @@ def destroy_session_data(backend, details, response, social_user, uid, user, *ar
 
     if hasattr(request.session, 'saved_email'):
         del request.session['saved_email']
-
-    if hasattr(request.session, 'saved_interests'):
-        del request.session['saved_interests']
-
-    if hasattr(request.session, 'saved_join_mailing_list'):
-        del request.session['saved_join_mailing_list']

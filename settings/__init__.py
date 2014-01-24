@@ -2,7 +2,7 @@
 import dj_database_url
 import os
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 
 
 def base(f=''):
@@ -19,6 +19,9 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {'default': dj_database_url.config()}
+
+# project name
+PACKAGE_NAMESPACE = 'djsocial'
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -219,9 +222,6 @@ SOCIAL_AUTH_PARTIAL_PIPELINE_KEY = 'partial_pipeline'
 # for django-orm-extensions to not conflict with south
 SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
 
-TWITTER_CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY', '')
-TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET', '')
-
 
 LOGIN_ERROR_URL = '/account/error/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
@@ -245,8 +245,16 @@ import djcelery
 
 djcelery.setup_loader()
 
+# Twitter settings
+TWITTER_CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY', '')
+TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET', '')
+TWITTER_MAX_DAILY_TWEETS = 100
+TWITTER_MAX_DAILY_RETWEET = 100
+TWITTER_MAX_DAILY_FAV = 100
+TWITTER_MAX_DAILY_FOLLOW = 10
+TWITTER_MAX_DAILY_UNFOLLOW = 10
 
 try:
-    from local_env import *
+    from settings.local_env import *
 except ImportError:
     pass

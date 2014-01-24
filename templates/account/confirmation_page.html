@@ -6,18 +6,19 @@
 {# should be <h1>{% trans 'Delete site' %}</h1> this is applicable to all outputted strings #}
 {# this will allow us to translate the site if we need to multiple languages #}
 
+{% block navbar %}{% endblock %}
+
 {% block centraal_content %}
-        <div class="row">
-            <div class="col-lg-offset-4 col-lg-5">
-                 {% block content %}
-                    <h1>{% trans 'Delete site' %}</h1>
-                    <p>{% trans 'Are you sure you want to delete user?' %}</p>
-                    <form action="./" method="POST">
-                    {% csrf_token %}
-                    <button class="btn btn-danger" type="submit">{% trans 'Yes, delete' %}</button>
-                    <a class="btn btn-default" href="{% url 'account-profile' %}">{% trans 'No, cancel' %}</a>
-                </form>
-                {% endblock %}
-            </div>
-        </div>
+    <hr />
+    <div class="jumbotron">
+        {% block content %}
+            <h1>{% trans 'Delete account' %}</h1>
+            <p>{% trans 'Are you sure you want to delete user?' %}</p>
+            <form action="./" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">{% trans 'Yes, delete' %}</button>
+                <a class="btn btn-default" href="{% url 'account-profile' %}">{% trans 'No, cancel' %}</a>
+            </form>
+        {% endblock %}
+    </div>
 {% endblock %}
