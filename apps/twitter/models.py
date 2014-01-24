@@ -22,53 +22,35 @@ class Twitter(models.Model):
         return u'%s' % self.user
 
 
-class Follower(models.Model):
+class ScheduleOrder(models.Model):
+    """ ScheduleOrder
     """
-    """
-    account = models.ForeignKey(Twitter, related_name='followers')
-    screen_name = models.CharField(_('Screen name'), max_length=200)
-
-
-class Following(models.Model):
-    """
-    """
-    account = models.ForeignKey(Twitter, related_name='following')
-    screen_name = models.CharField(_('Screen name'), max_length=200)
-
-
-class Hashtag(models.Model):
-    """ you will write a model to hold
-    1. name hash tag key - slug
-    2. last time of sync - timedate
-    3. user who created the hashtag - foreign key with user
-    4. number of times it retweeted/favirate - integer
-    4. operation (retweet or favirate) - char field with choice
-
-    ./manage.py sql twitter
-    ./manage.py schemamigration twitter --auto
-    ./manage.py migrate twitter
-    """
-
-    #models.SlugField() # this won't allow special characters #(**#$*
-    FUNCTIONS = (
-        ('R', 'Retweet'),
-        ('F', 'Favourites'),
+    FORMS = (
+        ('FollowUserForm', 'Follow user'),
+        ('UnfollowUserForm', 'Unfollow user'),
+        ('RetweetForm', 'Retweet'),
+        ('FavForm', 'Favourite'),
+        ('Hashtag_Form', 'Hashtag'),
     )
+    user = models.ForeignKey(Twitter)
+    label = models.CharField(_('Label'), max_length=200)
+    is_active = models.BooleanField(_('Is active'), default=True)
+    form = models.CharField(max_length=200, choices=FORMS)
+    args = models.CharField(max_length=100)
+    kwargs = models.CharField(max_length=200, null=True, blank=True)
 
-    hash_tag_key = models.SlugField()
-    last_time_sync = models.DateTimeField(auto_now_add=True)
-    created_user = models.ForeignKey(Twitter, related_name='created_user')
-    number_retweet_or_favourite = models.IntegerField(default=0)
-    retweet_or_favourite = models.CharField(_('Retweet or favourites'), max_length=10,
-                                            choices=FUNCTIONS, default='R')
+    def __unicode__(self):
+        return u'%s' % self.label
 
 
-class Operation(models.Model):
+class Order(models.Model):
+    """ Order
     """
-    """
+    PENDING = 'E'
+    COMPLETED = 'C'
     STATUSES = (
-        ('P', 'Pending'),
-        ('C', 'Completed')
+        (PENDING, 'Pending'),
+        (COMPLETED, 'Completed'),
     )
     FUNCTIONS = (
         ('follow_user', 'Follow user'),
@@ -76,20 +58,21 @@ class Operation(models.Model):
         ('retweet', 'Retweet'),
         ('favourite', 'Favourite'),
     )
+    user = models.ForeignKey(Twitter)
+    schedule_order = models.ForeignKey(ScheduleOrder, null=True, blank=True)
     perform_at = models.DateTimeField(auto_now_add=True)
     performed_at = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=2, choices=STATUSES, default='P')
-    user = models.ForeignKey(Twitter)
+    status = models.CharField(max_length=2, choices=STATUSES)
     func = models.CharField(max_length=200, choices=FUNCTIONS)
     args = models.CharField(max_length=100)
     kwargs = models.CharField(max_length=200, null=True, blank=True)
 
-    def run_operation(self):
+    def run_order(self):
         # execute operation based on type and args
         auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
         auth.set_access_token(self.user.access_token, self.user.secret_key)
         api = tweepy.API(auth)
-        #user = api.me()
+
         try:
             args = self.args.split(',')
         except:

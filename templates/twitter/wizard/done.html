@@ -1,0 +1,13 @@
+{% extends "twitter/base.html" %}
+{% load i18n %}
+
+{% block navbar %}{% endblock %}
+
+{% block centraal_content %}
+    <hr/>
+    <div class="jumbotron">
+        <h1>{% trans 'Order created successfully' %}</h1>
+
+        <p><a href="{% url 'twitter-home' %}">{% trans 'Go back' %}</a></p>
+    </div>
+{% endblock %}

@@ -1,12 +1,14 @@
 from django import forms
-from models import Hashtag
 
 
-class HashtagForm(forms.ModelForm):
+class CreateOrderForm(forms.Form):
     """
-
     """
-
-    class Meta:
-        model = Hashtag
-        fields = ('hash_tag_key', 'retweet_or_favourite')
+    order_types = (
+        ('FollowUserForm', 'Follow user'),
+        ('UnfollowUserForm', 'Unfollow user'),
+        ('RetweetForm', 'Retweet'),
+        ('FavForm', 'Favourite'),
+        ('Hashtag_Form', 'Hashtag'),
+    )
+    order_type = forms.ChoiceField(choices=order_types)

@@ -20,7 +20,7 @@
     <script type="text/javascript" src="{{ STATIC_URL }}holder.js"></script>
     {% block js %}{% endblock %}
     <!-- JavaScript & compressions ends here -->
-
+    {% block head %}{% endblock %}
     <title>{% block title %}{% trans 'djsocial' %}{% endblock %}</title>
 </head>
 <body>
@@ -42,13 +42,23 @@
                     </div>
                     <div class="navbar-collapse collapse">
                         <ul class="nav navbar-nav">
-                            <li><a href="#about">{% trans 'About' %}</a></li>
+                            {% if request.user.is_authenticated %}
+                                <li><a href="{% url 'twitter-home' %}">{% trans 'Twitter' %}</a></li>
+                            {% endif %}
+                            {% if request.user.is_anonymous %}
+                                <li><a href="#about">{% trans 'About' %}</a></li>
+                                <li><a href="#about">{% trans 'Technology' %}</a></li>
+                                <li><a href="#about">{% trans 'Contact us' %}</a></li>
+                            {% endif %}
                         </ul>
                         <ul class="nav navbar-nav pull-right">
+                            {% if request.user.is_anonymous %}
 
+                            {% endif %}
+                            <li><a href="#">{% trans 'Help' %}</a></li>
                             {% if request.user.is_authenticated %}
+
                                 <li><a href="{% url 'account-profile' %}">{% trans 'Settings' %}</a></li>
-                                <li><a href="{% url 'twitter-home' %}">{% trans 'Twitter' %}</a></li>
                                 <li><a href="{% url 'account-logout' %}">{% trans 'Sign out' %}</a></li>
                             {% else %}
                                 <li class="active"><a href="{% url 'account-signup' %}">{% trans 'Sign up' %}</a></li>
@@ -91,18 +101,18 @@
         {% endfor %}
     {% endif %}
 
-{% block centraal_content %}{% endblock %}
+    {% block centraal_content %}{% endblock %}
 
-{% block footer %}
-    <hr/>
-    <!-- FOOTER -->
-    <footer>
-        <p class="pull-right"><a href="#">{% trans 'Back to top' %}</a></p>
+    {% block footer %}
+        <hr/>
+        <!-- FOOTER -->
+        <footer>
+            <p class="pull-right"><a href="#">{% trans 'Back to top' %}</a></p>
 
-        <p>&copy; {% trans 'Developed by' %} {% trans 'Mo Mughrabi' %}. &middot; <a
-                href="#">{% trans 'Privacy' %}</a> &middot; <a href="#">{% trans 'Terms' %}</a></p>
-    </footer>
-{% endblock %}
+            <p>&copy; {% trans 'Developed by' %} {% trans 'Mo Mughrabi' %}. &middot; <a
+                    href="#">{% trans 'Privacy' %}</a> &middot; <a href="#">{% trans 'Terms' %}</a></p>
+        </footer>
+    {% endblock %}
 </div>
 <!-- /.container -->
 
