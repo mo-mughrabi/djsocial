@@ -64,19 +64,24 @@ class RelationshipForm(forms.ModelForm):
         try:
             label = '{0} back: runs {1}'.format(cleaned_data.get('operation'),
                                                 'once' if cleaned_data.get('execution') == u'True' else 'daily')
-            obj = ScheduleOrder.objects.get(label=label, user=get_object_or_404(Twitter, user=self.user), run_once=False)
+            obj = ScheduleOrder.objects.get(label=label, user=get_object_or_404(Twitter, user=self.user),
+                                            run_once=False)
             raise forms.ValidationError(_('This is a duplicate setup, you already have "{}"'.format(obj.label)))
         except ScheduleOrder.DoesNotExist:
             pass
         return cleaned_data
 
 
-class AutoTweetForm(forms.Form):
+class AutoTweetForm(forms.ModelForm):
     """ AutoTweetForm
     """
+    operation_options = (
+        ('favorite', _('favorite')),
+        ('retweet', _('retweet')),
+    )
     execution_options = (
-        ('once', _('Execute once')),
-        ('daily', _('Schedule daily')),
+        (True, _('Execute once')),
+        (False, _('Schedule daily')),
     )
     search_style_options = (
         (0, 'Search once a day, re-tweet result every hour'),
@@ -88,6 +93,7 @@ class AutoTweetForm(forms.Form):
         (2, '1 every two hours'),
         (4, '1 every 4 hours'),
     )
+    operation = forms.ChoiceField(choices=operation_options, widget=forms.HiddenInput)
     execution = forms.ChoiceField(choices=execution_options, widget=forms.Select(attrs={'class': 'form-control'}))
 
     search_by_hash_tag = forms.SlugField(widget=forms.TextInput(attrs={'class': 'form-control'}), help_text=_(
@@ -104,7 +110,44 @@ class AutoTweetForm(forms.Form):
     minimum_retweet = forms.DecimalField(initial=0, widget=forms.TextInput(
         attrs={'class': 'form-control', 'data-group-class': 'col-xs-3'}), )
 
+    class Meta:
+        model = ScheduleOrder
+        fields = ('execution', 'search_by_hash_tag', 'search_style', 'maximum_per_hour', 'minimum_favorite',
+                  'minimum_retweet', 'operation')
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user') or None
         kwargs.pop('user')
         super(AutoTweetForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        cleaned_data = self.cleaned_data
+        obj = super(AutoTweetForm, self).save(commit=commit)
+
+        obj.label = 'search for {0} and {1} - {2}'.format(cleaned_data.get('search_by_hash_tag'),
+                                                          cleaned_data.get('operation'),
+                                                          'once' if cleaned_data.get(
+                                                              'execution') == u'True' else 'daily')
+
+        obj.run_once = True if cleaned_data.get('execution') == u'True' else False
+        obj.func = cleaned_data.get('operation')
+        obj.kwargs = {'search_style': cleaned_data.get('search_style') or None,
+                      'maximum_per_hour': cleaned_data.get('maximum_per_hour') or None,
+                      'minimum_favorite': cleaned_data.get('minimum_favorite') or None,
+                      'minimum_retweet': cleaned_data.get('minimum_retweet') or None}
+        return obj
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        try:
+            label = 'search for {0} and {1} - {2}'.format(cleaned_data.get('search_by_hash_tag'),
+                                                          cleaned_data.get('operation'),
+                                                          'once' if cleaned_data.get(
+                                                              'execution') == u'True' else 'daily')
+
+            obj = ScheduleOrder.objects.get(label=label, user=get_object_or_404(Twitter, user=self.user),
+                                            run_once=False)
+            raise forms.ValidationError(_('This is a duplicate setup, you already have "{}"'.format(obj.label)))
+        except ScheduleOrder.DoesNotExist:
+            pass
+        return cleaned_data

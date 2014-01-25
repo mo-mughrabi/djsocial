@@ -45,11 +45,11 @@ class CreateOrderWizard(SessionWizardView):
 
     def get_form_initial(self, step):
 
-        if step in ('relationship_step', ):
+        if step in ('relationship_step', 'auto_tweet_step'):
             cleaned_data = self.get_cleaned_data_for_step('order_step')
             init_dict = {}
 
-            if cleaned_data.get('order_type') in (u'follow_form', u'unfollow_form'):
+            if cleaned_data.get('order_type'):
                 init_dict.update({'operation': cleaned_data.get('order_type').replace('_form', '')})
                 return init_dict
 
