@@ -42,4 +42,16 @@ class CreateOrderWizard(SessionWizardView):
         }, context_instance=RequestContext(self.request))
 
     def get_template_names(self):
-        return ['{0}step_{1}.html'.format(self.base_wizard, self.steps.current)]
+        return ['{0}steps.html'.format(self.base_wizard)]
+
+    def get_form_initial(self, step):
+
+        if step == u'1':
+            cleaned_data = self.get_cleaned_data_for_step(u'0')
+            init_dict = {}
+
+            if cleaned_data.get('order_type') in (u'follow_form', u'unfollow_form'):
+                init_dict.update({'operation': cleaned_data.get('order_type').replace('_form', '')})
+                return init_dict
+
+        return self.initial_dict.get(step, {})

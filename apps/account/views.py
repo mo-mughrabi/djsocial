@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
@@ -80,7 +80,7 @@ class DeleteProfileView(DeleteView):
 
     """
     model = User
-    template_name = 'account/confirmation_page.html'
+    template_name = 'account/confirm.html'
 
     def get(self, request, pk):
         user = User.objects.get(pk=pk)

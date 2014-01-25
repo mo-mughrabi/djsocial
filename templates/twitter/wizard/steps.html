@@ -1,0 +1,45 @@
+{% extends "twitter/base.html" %}
+{% load i18n %}
+
+{% block head %}
+    {{ wizard.form.media }}
+{% endblock %}
+
+{% block centraal_content %}
+    <div class="jumbotron">
+        <p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+
+        <form class="form" role="form" method="POST">
+            {% csrf_token %}
+            {{ wizard.management_form }}
+            {% if wizard.form.forms %}
+                {{ wizard.form.management_form }}
+                {% for form in wizard.form.forms %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            {{ field.label_tag }}
+                            {{ field.field }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                {% for field in wizard.form.visible_fields %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        <small class="help-block">{{ field.help_text }}</small>
+                    </div>
+                {% endfor %}
+                {% for field in wizard.form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+            {% endif %}
+            <hr/>
+            {% if wizard.steps.prev %}
+                <button class="btn" name="wizard_goto_step" type="submit"
+                        value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+            {% endif %}
+            <input class="btn" type="submit" value="{% trans "next step" %}"/>
+        </form>
+    </div>
+{% endblock %}
