@@ -1,5 +1,5 @@
 {% extends "twitter/base.html" %}
-{% load i18n %}
+{% load i18n utils %}
 
 {% block head %}
     {{ wizard.form.media }}
@@ -32,16 +32,22 @@
                 {% endfor %}
             {% else %}
                 {% for field in wizard.form.visible_fields %}
-                    <div class="form-group {% if field.errors %}has-error{% endif %}">
-                        {{ field.label_tag }}
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                                <label class="control-label">{{ error }}</label>
-                            {% endfor %}
-                        {% endif %}
-                        {{ field }}
-                        <small class="help-block">{{ field.help_text }}</small>
+                    {% if 'data-group-class' in field.field.widget.attrs %}
+                        <div class="row">
+                    {% endif %}
+                <div class="form-group {% if field.errors %}has-error{% endif %}{% if 'data-group-class' in field.field.widget.attrs %} {% dict_key_lookup field.field.widget.attrs 'data-group-class' %}{% endif %}">
+                    {{ field.label_tag }}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <label class="control-label">{{ error }}</label>
+                        {% endfor %}
+                    {% endif %}
+                    {{ field }}
+                    <small class="help-block">{{ field.help_text }}</small>
+                </div>
+                {% if 'data-group-class' in field.field.widget.attrs %}
                     </div>
+                {% endif %}
                 {% endfor %}
                 {% for field in wizard.form.hidden_fields %}
                     {{ field }}

@@ -9,12 +9,14 @@ boto==2.13.3
 celery==3.0.23
 dj-database-url==0.2.2
 django-celery==3.0.23
+django-ses==0.4.1
 django-social-auth==0.7.28
 django-storages==1.1.8
 django-suit==0.2.5
 ecdsa==0.9
 gunicorn==18.0
 httplib2==0.8
+jsonfield==0.9.20
 kombu==2.5.14
 lxml==3.2.3
 oauth2==1.5.211
@@ -32,4 +34,4 @@ storage==0.0.5a2
 tweepy==2.1
 update-checker==0.6
 wsgiref==0.1.2
-django-ses==0.4.1
+yolk==0.4.3

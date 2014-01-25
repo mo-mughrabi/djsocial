@@ -1,5 +1,5 @@
-{# TODO: Build twitter index page, it should be a panel page where user can see a left navigation and center area #}
 {% extends "twitter/base.html" %}
+{% load i18n %}
 
 {% block centraal_content %}
     <div class="container">
@@ -7,24 +7,30 @@
             <div class="col-md-2">
                 {% include 'twitter/sidebar.html' %}
             </div>
+            <div class="col-md-10">
+                <h1>{% trans 'Dashboard to be placed here...' %}</h1>
 
-            <form method="POST">{% csrf_token %}
-                <div class="col-md-9">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                            Following options<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li>
-                                <input type="submit" name="form-type" value="Follow back">
-                            </li>
-                            <li>
-                                <input type="submit" name="form-type" value="Unfollow">
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </form>
+                <h3>{% trans 'Scheduled orders' %}</h3>
+                <table class="table table-striped">
+
+                    <tr>
+                        <td>{% trans 'Label' %}</td>
+                        <td>{% trans 'Status' %}</td>
+                        <td>{% trans 'Last run' %}</td>
+                        <td>{% trans 'Created at' %}</td>
+                    </tr>
+
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.label }}</td>
+                            <td>{{ order.get_status_display }}</td>
+                            <td>{{ order.last_run|default_if_none:"Never" }}</td>
+                            <td>{{ order.created_at|timesince }} {% trans 'ago' %}</td>
+                        </tr>
+                    {% endfor %}
+
+                </table>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from jsonfield import JSONField
 from tweepy import OAuthHandler
 import tweepy
 
@@ -25,19 +26,27 @@ class Twitter(models.Model):
 class ScheduleOrder(models.Model):
     """ ScheduleOrder
     """
-    FORMS = (
-        ('FollowUserForm', 'Follow user'),
-        ('UnfollowUserForm', 'Unfollow user'),
-        ('RetweetForm', 'Retweet'),
-        ('FavForm', 'Favourite'),
-        ('Hashtag_Form', 'Hashtag'),
+    FUNCTIONS = (
+        ('follow_user', 'Follow user'),
+        ('unfollow_user', 'Unfollow user'),
+        ('retweet', 'Retweet'),
+        ('favourite', 'Favourite'),
     )
+    status_options = (
+        ('A', 'Active'),
+        ('D', 'Deleted'),
+        ('R', 'Running'),
+    )
+
     user = models.ForeignKey(Twitter)
-    label = models.CharField(_('Label'), max_length=200)
-    is_active = models.BooleanField(_('Is active'), default=True)
-    form = models.CharField(max_length=200, choices=FORMS)
+    label = models.CharField(_('Label'), max_length=250)
+    run_once = models.BooleanField(default=True)
+    status = models.CharField(max_length=6, choices=status_options, default='A')
+    func = models.CharField(max_length=200, choices=FUNCTIONS)
     args = models.CharField(max_length=100)
-    kwargs = models.CharField(max_length=200, null=True, blank=True)
+    kwargs = JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_run = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return u'%s' % self.label
@@ -48,8 +57,10 @@ class Order(models.Model):
     """
     PENDING = 'E'
     COMPLETED = 'C'
+    FAILED = 'F'
     STATUSES = (
         (PENDING, 'Pending'),
+        (FAILED, 'Failed'),
         (COMPLETED, 'Completed'),
     )
     FUNCTIONS = (
@@ -65,7 +76,8 @@ class Order(models.Model):
     status = models.CharField(max_length=2, choices=STATUSES)
     func = models.CharField(max_length=200, choices=FUNCTIONS)
     args = models.CharField(max_length=100)
-    kwargs = models.CharField(max_length=200, null=True, blank=True)
+    kwargs = JSONField(null=True, blank=True)
+    result = models.TextField(null=True, blank=True)
 
     def run_order(self):
         # execute operation based on type and args

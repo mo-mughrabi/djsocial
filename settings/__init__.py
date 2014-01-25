@@ -219,6 +219,9 @@ SOCIAL_AUTH_ENABLED_BACKENDS = ('twitter',)
 
 SOCIAL_AUTH_PARTIAL_PIPELINE_KEY = 'partial_pipeline'
 
+# change from default serializers to pickle serializer
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
 # for django-orm-extensions to not conflict with south
 SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
 
