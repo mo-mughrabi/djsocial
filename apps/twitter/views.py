@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
-from models import Twitter, ScheduleOrder
+from models import Twitter, ScheduleOrder, Order
 
 
 class DashboardView(View):
@@ -15,5 +15,5 @@ class DashboardView(View):
     def get(self, request):
         scheduled_orders = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=request.user),
                                                         run_once=False)
-        orders = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=request.user), run_once=True)
+        orders = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user), )
         return render(request, self.template_name, {'scheduled_orders': scheduled_orders, 'orders': orders})

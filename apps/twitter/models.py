@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from django.conf import settings
 from django.db import models
+from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from djorm_hstore.fields import DictionaryField
 from djorm_pgarray.fields import ArrayField
@@ -95,6 +96,14 @@ class Order(models.Model):
     args = ArrayField(dbtype='text', null=True, blank=True)
     kwargs = DictionaryField(null=True, blank=True, db_index=True)
     result = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+
+        try:
+            return u'{0} "{1}" by {2}'.format(self.kwargs['func'].capitalize(), truncatechars(self.kwargs['tweet'], 50),
+                                              self.kwargs['screen_name'])
+        except KeyError:
+            return u'%s' % self.func
 
     def run_order(self):
         # execute operation based on type and args

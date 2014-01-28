@@ -34,18 +34,13 @@ class RelationshipForm(forms.ModelForm):
         ('follow', _('Follow')),
         ('unfollow', _('Unfollow')),
     )
-    execution_options = (
-        (True, _('Execute once')),
-        (False, _('Schedule daily')),
-    )
     operation = forms.ChoiceField(choices=operation_options, widget=forms.HiddenInput)
-    execution = forms.ChoiceField(choices=execution_options, widget=forms.Select(attrs={'class': 'form-control'}))
     exclude = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': '3'}),
                               help_text=_('Use comma separated username that you want to exclude'), required=False)
 
     class Meta:
         model = ScheduleOrder
-        fields = ('operation', 'execution', 'exclude')
+        fields = ('operation', 'exclude')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user') or None
@@ -56,9 +51,8 @@ class RelationshipForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
         obj = super(RelationshipForm, self).save(commit=commit)
 
-        obj.label = '{0} back: runs {1}'.format(cleaned_data.get('operation'),
-                                                'once' if cleaned_data.get('execution') == u'True' else 'daily')
-        obj.run_once = True if cleaned_data.get('execution') == u'True' else False
+        obj.label = '{0} back: runs hourly'.format(cleaned_data.get('operation'))
+        obj.run_once = False
         obj.func = cleaned_data.get('operation')
         obj.kwargs = {'exclude': cleaned_data.get('exclude') or '',
                       'func': cleaned_data.get('operation'), }
@@ -67,8 +61,7 @@ class RelationshipForm(forms.ModelForm):
     def clean(self):
         cleaned_data = self.cleaned_data
         try:
-            label = '{0} back: runs {1}'.format(cleaned_data.get('operation'),
-                                                'once' if cleaned_data.get('execution') == u'True' else 'daily')
+            label = '{0} back: runs hourly'.format(cleaned_data.get('operation'))
             obj = ScheduleOrder.objects.get(label=label, user=get_object_or_404(Twitter, user=self.user),
                                             run_once=False)
             raise forms.ValidationError(_('This is a duplicate setup, you already have "{}"'.format(obj.label)))
@@ -100,30 +93,16 @@ class AutoTweetSearchForm(forms.ModelForm):
         ('favorite', _('favorite')),
         ('retweet', _('retweet')),
     )
-    execution_options = (
-        (True, _('Execute once')),
-        (False, _('Schedule daily')),
-    )
     search_style_options = (
         (0, 'Search once a day, re-tweet result every hour'),
         (0, 'Search every hour, re-tweet result'),
     )
-    maximum_per_hour_options = (
-        (.0, '2 per hour'),
-        (1, '1 per hour'),
-        (2, '1 every two hours'),
-        (4, '1 every 4 hours'),
-    )
     operation = forms.ChoiceField(choices=operation_options, widget=forms.HiddenInput)
-    execution = forms.ChoiceField(choices=execution_options, widget=forms.Select(attrs={'class': 'form-control'}))
 
     search_by_hash_tag = forms.SlugField(widget=forms.TextInput(attrs={'class': 'form-control'}), help_text=_(
         'Hash Tag will be used to search for tweets desired for retweeting'))
 
     search_style = forms.ChoiceField(choices=search_style_options, widget=forms.Select(attrs={'class': 'form-control'}))
-
-    maximum_per_hour = forms.ChoiceField(choices=maximum_per_hour_options, label=_('Maximum re-tweets per hour'),
-                                         widget=forms.Select(attrs={'class': 'form-control'}))
 
     minimum_favorite = forms.DecimalField(initial=0, widget=forms.TextInput(
         attrs={'class': 'form-control', 'data-group-class': 'col-xs-3'}), )
@@ -133,7 +112,7 @@ class AutoTweetSearchForm(forms.ModelForm):
 
     class Meta:
         model = ScheduleOrder
-        fields = ('execution', 'search_by_hash_tag', 'search_style', 'maximum_per_hour', 'minimum_favorite',
+        fields = ('search_by_hash_tag', 'search_style', 'minimum_favorite',
                   'minimum_retweet', 'operation')
 
     def __init__(self, *args, **kwargs):
@@ -156,16 +135,13 @@ class AutoTweetSearchForm(forms.ModelForm):
         func = cleaned_data.get('operation')
         args = cleaned_data.get('search_by_hash_tag')
         kwargs = {'search_style': cleaned_data.get('search_style') or None,
-                  'maximum_per_hour': cleaned_data.get('maximum_per_hour') or None,
                   'func': cleaned_data.get('operation').replace('_search', ''),
                   'minimum_favorite': cleaned_data.get('minimum_favorite') or None,
                   'minimum_retweet': cleaned_data.get('minimum_retweet') or None}
 
-        label = 'search for {0} and {1} - {2}'.format(' '.join(cleaned_data.get('search_by_hash_tag')),
-                                                      cleaned_data.get('operation').replace('_search', ''),
-                                                      'once' if cleaned_data.get(
-                                                          'execution') == u'True' else 'daily')
-        run_once = True if cleaned_data.get('execution') == u'True' else False
+        label = 'search for {0} and {1} - hourly'.format(' '.join(cleaned_data.get('search_by_hash_tag')),
+                                                         cleaned_data.get('operation').replace('_search', ''))
+        run_once = False
         return func, args, kwargs, label, run_once
 
     def save(self, commit=True):
@@ -196,24 +172,10 @@ class AutoTweetUserForm(forms.ModelForm):
         ('favorite', _('favorite')),
         ('retweet', _('retweet')),
     )
-    execution_options = (
-        (True, _('Execute once')),
-        (False, _('Schedule daily')),
-    )
-    maximum_per_hour_options = (
-        (.0, '2 per hour'),
-        (1, '1 per hour'),
-        (2, '1 every two hours'),
-        (4, '1 every 4 hours'),
-    )
     operation = forms.ChoiceField(choices=operation_options, widget=forms.HiddenInput)
-    execution = forms.ChoiceField(choices=execution_options, widget=forms.Select(attrs={'class': 'form-control'}))
 
     twitter_user = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
                                    help_text=_('Comma separated value, specify users you want watch (4 users maximum)'))
-
-    maximum_per_hour = forms.ChoiceField(choices=maximum_per_hour_options, label=_('Maximum re-tweets per hour'),
-                                         widget=forms.Select(attrs={'class': 'form-control'}))
 
     minimum_favorite = forms.DecimalField(initial=0, widget=forms.TextInput(
         attrs={'class': 'form-control', 'data-group-class': 'col-xs-3'}), )
@@ -223,7 +185,7 @@ class AutoTweetUserForm(forms.ModelForm):
 
     class Meta:
         model = ScheduleOrder
-        fields = ('execution', 'twitter_user', 'maximum_per_hour', 'minimum_favorite', 'minimum_retweet', 'operation')
+        fields = ('twitter_user', 'minimum_favorite', 'minimum_retweet', 'operation')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.get('user') or None
@@ -251,16 +213,14 @@ class AutoTweetUserForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
         func = cleaned_data.get('operation')
         args = cleaned_data.get('twitter_user') or None
-        kwargs = {'maximum_per_hour': cleaned_data.get('maximum_per_hour') or None,
-                  'minimum_favorite': cleaned_data.get('minimum_favorite') or None,
+        kwargs = {'minimum_favorite': cleaned_data.get('minimum_favorite') or None,
                   'func': cleaned_data.get('operation').replace('_watch', ''),
                   'minimum_retweet': cleaned_data.get('minimum_retweet') or None}
 
-        label = 'watch {0} and {1} - {2}'.format(','.join(['@{}'.format(i) for i in cleaned_data.get('twitter_user')]),
-                                                 cleaned_data.get('operation').replace('_watch', ''),
-                                                 'once' if cleaned_data.get(
-                                                     'execution') == u'True' else 'daily')
-        run_once = True if cleaned_data.get('execution') == u'True' else False
+        label = 'watch {0} and {1} - hourly'.format(
+            ','.join(['@{}'.format(i) for i in cleaned_data.get('twitter_user')]),
+            cleaned_data.get('operation').replace('_watch', ''))
+        run_once = False
         return func, args, kwargs, label, run_once
 
     def save(self, commit=True):

@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand, CommandError
-from django.db import connections
-from django.core import management
-import os
+from django.core.management.base import BaseCommand
 from django.conf import settings
 import tweepy
-from tweepy import Stream
 from tweepy import OAuthHandler, Cursor
-from tweepy.streaming import StreamListener
 from apps.twitter.models import Twitter
 
 
@@ -27,13 +22,14 @@ class Command(BaseCommand):
 
         last_id = None
 
-        for tweet in Cursor(api.user_timeline, screen_name='bebeknil1', include_rts=False).items(10):
+        for tweet in Cursor(api.user_timeline, screen_name='xxx', include_rts=False).items(10):
             if last_id is None:
                 last_id = tweet.id
-            print tweet.text, tweet.id
+            #print tweet.author.screen_name
+            print tweet.__dict__
 
         print '----- new query'
-        for tweet in Cursor(api.user_timeline, screen_name='bebeknil1', since_id=last_id, include_rts=False).items():
+        for tweet in Cursor(api.user_timeline, screen_name='xxx', since_id=last_id, include_rts=False).items():
             print tweet.text, tweet.id
             last_id = tweet.id
             print
