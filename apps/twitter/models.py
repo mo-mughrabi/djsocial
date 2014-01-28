@@ -31,7 +31,7 @@ class Twitter(models.Model):
 class ScheduleOrder(models.Model):
     """ ScheduleOrder
     """
-    FUNCTIONS = (
+    function_options = (
         ('follow_user', 'Follow user'),
         ('unfollow_user', 'Unfollow user'),
         ('retweet', 'Retweet'),
@@ -41,15 +41,17 @@ class ScheduleOrder(models.Model):
         ('A', 'Active'),
         ('D', 'Deleted'),
         ('R', 'Running'),
+        ('P', 'Pending'),
     )
 
     user = models.ForeignKey(Twitter)
     label = models.CharField(_('Label'), max_length=250)
     run_once = models.BooleanField(default=True)
     status = models.CharField(max_length=6, choices=status_options, default='A')
-    func = models.CharField(max_length=200, choices=FUNCTIONS)
-    args = ArrayField(dbtype="text")
+    func = models.CharField(max_length=200, choices=function_options)
+    args = ArrayField(dbtype='text', null=True, blank=True)
     kwargs = DictionaryField(null=True, blank=True, db_index=True)
+    data = DictionaryField(null=True, blank=True, help_text=_('Used to maintain data about process details'))
     created_at = models.DateTimeField(auto_now_add=True)
     last_run = models.DateTimeField(null=True, blank=True)
 
@@ -58,33 +60,40 @@ class ScheduleOrder(models.Model):
     def __unicode__(self):
         return u'%s' % self.label
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if self.run_once and self.status == 'A':
+            self.status = 'P'
+
+        super(ScheduleOrder, self).save(force_insert=force_insert, force_update=force_update, using=using,
+                                        update_fields=update_fields)
+
 
 class Order(models.Model):
     """ Order
     """
-    PENDING = 'E'
+    PENDING = 'P'
     COMPLETED = 'C'
     FAILED = 'F'
-    STATUSES = (
+    status_options = (
         (PENDING, 'Pending'),
         (FAILED, 'Failed'),
         (COMPLETED, 'Completed'),
     )
-    FUNCTIONS = (
+    function_options = (
         ('follow_user', 'Follow user'),
         ('unfollow_user', 'Unfollow user'),
         ('retweet', 'Retweet'),
         ('favourite', 'Favourite'),
     )
     user = models.ForeignKey(Twitter)
-    parent = models.ForeignKey('self', null=True, blank=True)
     schedule_order = models.ForeignKey(ScheduleOrder, null=True, blank=True)
-    perform_at = models.DateTimeField(auto_now_add=True)
-    performed_at = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=2, choices=STATUSES)
-    func = models.CharField(max_length=200, choices=FUNCTIONS)
-    args = models.CharField(max_length=100)
-    kwargs = JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    executed_at = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=2, choices=status_options, default=PENDING)
+    func = models.CharField(max_length=200, choices=function_options)
+    args = ArrayField(dbtype='text', null=True, blank=True)
+    kwargs = DictionaryField(null=True, blank=True, db_index=True)
     result = models.TextField(null=True, blank=True)
 
     def run_order(self):
@@ -93,17 +102,12 @@ class Order(models.Model):
         auth.set_access_token(self.user.access_token, self.user.secret_key)
         api = tweepy.API(auth)
 
-        try:
-            args = self.args.split(',')
-        except:
-            # handle if args is a single argument or none
-            raise
         if self.func == 'follow_user':
-            api.create_friendship(args[0])
+            api.create_friendship(*self.args)
         if self.func == 'unfollow_user':
-            api.destroy_friendship(args[0])
+            api.destroy_friendship(*self.args)
         if self.func == 'retweet':
-            api.retweet(args[0])
+            api.retweet(*self.args)
         if self.func == 'favourite':
-            api.create_favorite(args[0])
+            api.create_favorite(*self.args)
 

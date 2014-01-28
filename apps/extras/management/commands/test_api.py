@@ -6,34 +6,36 @@ import os
 from django.conf import settings
 import tweepy
 from tweepy import Stream
-from tweepy import OAuthHandler
+from tweepy import OAuthHandler, Cursor
 from tweepy.streaming import StreamListener
-from apps.twitter.models import Account, Operation
+from apps.twitter.models import Twitter
 
 
-def get_diff(list1,list2):
+def get_diff(list1, list2):
     """Outputs objects which are in list1 but not list 2"""
     return list(set(list1).difference(set(list2)))
+
 
 class Command(BaseCommand):
     args = '<No arguments>'
 
     def handle(self, *args, **options):
         auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-        account = Account.objects.get(pk=2)
+        account = Twitter.objects.get(pk=1)
         auth.set_access_token(account.access_token, account.secret_key)
         api = tweepy.API(auth)
-        user = api.me()
 
-        follower_ids = []
-        for follower in tweepy.Cursor(api.followers).items():
-            follower_ids.append(follower.id)
+        last_id = None
 
-        friend_ids = []
-        for friend in tweepy.Cursor(api.friends).items():
-            friend_ids.append(friend.id)
+        for tweet in Cursor(api.user_timeline, screen_name='bebeknil1', include_rts=False).items(10):
+            if last_id is None:
+                last_id = tweet.id
+            print tweet.text, tweet.id
 
-        follow_list = get_diff(follower_ids, friend_ids)
+        print '----- new query'
+        for tweet in Cursor(api.user_timeline, screen_name='bebeknil1', since_id=last_id, include_rts=False).items():
+            print tweet.text, tweet.id
+            last_id = tweet.id
+            print
 
-        for follower in follow_list:
-            Operation.objects.create(user=account, func='follow_user', args='{},'.format(follower))
+        print last_id

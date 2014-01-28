@@ -4,8 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
-from tasks import follow_back
-from tasks import unfollow
 from models import Twitter, ScheduleOrder
 
 

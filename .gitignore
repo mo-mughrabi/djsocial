@@ -3,3 +3,4 @@
 local_env.py
 notes.txt
 celerybeat-schedule
+celerybeat-schedule.db

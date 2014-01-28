@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django import forms
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-import re
+from tweepy import OAuthHandler
+import tweepy
 from models import ScheduleOrder, Twitter
 
 
 class OrderTypeForm(forms.Form):
     """ OrderTypeForm
+    TODO: Add validation to allow every user for X amount of active schdule jobs
     """
     order_types = (
         ('follow_form', _('Auto follow back')),
@@ -57,7 +60,8 @@ class RelationshipForm(forms.ModelForm):
                                                 'once' if cleaned_data.get('execution') == u'True' else 'daily')
         obj.run_once = True if cleaned_data.get('execution') == u'True' else False
         obj.func = cleaned_data.get('operation')
-        obj.kwargs = {'exclude': cleaned_data.get('exclude') or ''}
+        obj.kwargs = {'exclude': cleaned_data.get('exclude') or '',
+                      'func': cleaned_data.get('operation'), }
         return obj
 
     def clean(self):
@@ -142,17 +146,23 @@ class AutoTweetSearchForm(forms.ModelForm):
         data = [self.cleaned_data['search_by_hash_tag'], ]
         return data
 
+    def clean_operation(self):
+        # add validation for search field / must be twitter slug compatible
+        data = '{}_search'.format(self.cleaned_data['operation'])
+        return data
+
     def get_order_values(self):
         cleaned_data = self.cleaned_data
         func = cleaned_data.get('operation')
         args = cleaned_data.get('search_by_hash_tag')
         kwargs = {'search_style': cleaned_data.get('search_style') or None,
                   'maximum_per_hour': cleaned_data.get('maximum_per_hour') or None,
+                  'func': cleaned_data.get('operation').replace('_search', ''),
                   'minimum_favorite': cleaned_data.get('minimum_favorite') or None,
                   'minimum_retweet': cleaned_data.get('minimum_retweet') or None}
 
         label = 'search for {0} and {1} - {2}'.format(' '.join(cleaned_data.get('search_by_hash_tag')),
-                                                      cleaned_data.get('operation'),
+                                                      cleaned_data.get('operation').replace('_search', ''),
                                                       'once' if cleaned_data.get(
                                                           'execution') == u'True' else 'daily')
         run_once = True if cleaned_data.get('execution') == u'True' else False
@@ -224,15 +234,18 @@ class AutoTweetUserForm(forms.ModelForm):
         # will return list so it can be passed into kwargs dictionary
         data = self.cleaned_data['twitter_user']
         users = data.split(',')
-        users = [x for x in users if x not in ('', u'')]
+        users = [x.strip() for x in users if x.strip() not in ('', u'')]
         if len(users) > 4:
             raise forms.ValidationError(_('Only 4 users maximum'))
 
         if sorted(users) != sorted(list(set(users))):
             raise forms.ValidationError(_('You must provide unique users'))
-        # for user in users:
-        #     self.Meta.model.objects.filter(args__icontains=user)
         return users
+
+    def clean_operation(self):
+        # add validation for search field / must be twitter slug compatible
+        data = '{}_watch'.format(self.cleaned_data['operation'])
+        return data
 
     def get_order_values(self):
         cleaned_data = self.cleaned_data
@@ -240,10 +253,11 @@ class AutoTweetUserForm(forms.ModelForm):
         args = cleaned_data.get('twitter_user') or None
         kwargs = {'maximum_per_hour': cleaned_data.get('maximum_per_hour') or None,
                   'minimum_favorite': cleaned_data.get('minimum_favorite') or None,
+                  'func': cleaned_data.get('operation').replace('_watch', ''),
                   'minimum_retweet': cleaned_data.get('minimum_retweet') or None}
 
-        label = 'watch {0} and {1} - {2}'.format(','.join(cleaned_data.get('twitter_user')),
-                                                 cleaned_data.get('operation'),
+        label = 'watch {0} and {1} - {2}'.format(','.join(['@{}'.format(i) for i in cleaned_data.get('twitter_user')]),
+                                                 cleaned_data.get('operation').replace('_watch', ''),
                                                  'once' if cleaned_data.get(
                                                      'execution') == u'True' else 'daily')
         run_once = True if cleaned_data.get('execution') == u'True' else False
@@ -281,5 +295,20 @@ class AutoTweetUserForm(forms.ModelForm):
             raise forms.ValidationError(_('This is a duplicate setup, you already have "{}"'.format(obj.label)))
         except ScheduleOrder.DoesNotExist:
             pass
+
+        try:
+            users = args
+            for user in users:
+                auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'),
+                                    getattr(settings, 'TWITTER_CONSUMER_SECRET'))
+                account = Twitter.objects.get(user_id=self.user.id)
+                auth.set_access_token(account.access_token, account.secret_key)
+                api = tweepy.API(auth)
+                try:
+                    api.get_user(user)
+                except:
+                    raise forms.ValidationError(_('User {} does not exist on twitter'.format(user)))
+        except:
+            raise
 
         return cleaned_data
