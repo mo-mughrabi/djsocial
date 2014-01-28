@@ -3,9 +3,12 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from djorm_hstore.fields import DictionaryField
+from djorm_pgarray.fields import ArrayField
 from jsonfield import JSONField
 from tweepy import OAuthHandler
 import tweepy
+from managers import TwitterManager, ScheduleOrderManger
 
 
 class Twitter(models.Model):
@@ -18,6 +21,8 @@ class Twitter(models.Model):
     secret_key = models.CharField(_('Secret Key'), max_length=200)
     followers_sum = models.PositiveIntegerField(default=0)
     following_sum = models.PositiveIntegerField(default=0)
+
+    objects = TwitterManager()
 
     def __unicode__(self):
         return u'%s' % self.user
@@ -43,10 +48,12 @@ class ScheduleOrder(models.Model):
     run_once = models.BooleanField(default=True)
     status = models.CharField(max_length=6, choices=status_options, default='A')
     func = models.CharField(max_length=200, choices=FUNCTIONS)
-    args = models.CharField(max_length=100)
-    kwargs = JSONField(null=True, blank=True)
+    args = ArrayField(dbtype="text")
+    kwargs = DictionaryField(null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_run = models.DateTimeField(null=True, blank=True)
+
+    objects = ScheduleOrderManger()
 
     def __unicode__(self):
         return u'%s' % self.label
@@ -70,6 +77,7 @@ class Order(models.Model):
         ('favourite', 'Favourite'),
     )
     user = models.ForeignKey(Twitter)
+    parent = models.ForeignKey('self', null=True, blank=True)
     schedule_order = models.ForeignKey(ScheduleOrder, null=True, blank=True)
     perform_at = models.DateTimeField(auto_now_add=True)
     performed_at = models.DateTimeField(null=True, blank=True)

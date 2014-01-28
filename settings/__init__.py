@@ -230,6 +230,7 @@ LOGIN_ERROR_URL = '/account/error/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/'
 
+
 # email settings - django-ses
 EMAIL_BACKEND = 'django_ses.SESBackend'
 

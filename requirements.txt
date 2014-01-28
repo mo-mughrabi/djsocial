@@ -13,6 +13,10 @@ django-ses==0.4.1
 django-social-auth==0.7.28
 django-storages==1.1.8
 django-suit==0.2.5
+djorm-ext-core==0.7
+djorm-ext-expressions==0.6
+djorm-ext-hstore==0.5
+djorm-ext-pgarray==0.10
 ecdsa==0.9
 gunicorn==18.0
 httplib2==0.8

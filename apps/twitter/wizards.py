@@ -4,14 +4,16 @@ import os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.template import RequestContext
-from apps.twitter.forms import OrderTypeForm, RelationshipForm, AutoTweetForm
+from forms import OrderTypeForm, RelationshipForm, AutoTweetForm, AutoTweetSearchForm, AutoTweetUserForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.formtools.wizard.views import SessionWizardView
 from apps.twitter.models import Twitter
 
 FORMS = [("order_step", OrderTypeForm),
          ("relationship_step", RelationshipForm),
-         ("auto_tweet_step", AutoTweetForm)]
+         ("auto_tweet_step", AutoTweetForm),
+         ("auto_tweet_search_step", AutoTweetSearchForm),
+         ("auto_tweet_user_step", AutoTweetUserForm)]
 
 
 def toggle_relationship_form(wizard):
@@ -30,11 +32,30 @@ def toggle_auto_tweet_form(wizard):
     return cleaned_data['order_type'] in ('retweet_form', 'favorite_form')
 
 
+def toggle_auto_tweet_search_form(wizard):
+    """Return true if user selected auto re-tweet"""
+    # Get cleaned data from payment step
+    cleaned_data = wizard.get_cleaned_data_for_step('auto_tweet_step') or {'auto_tweet_operation': 'none'}
+    # Return true
+    return cleaned_data['auto_tweet_operation'] == 'SEARCH'
+
+
+def toggle_auto_tweet_user_form(wizard):
+    """Return true if user selected auto re-tweet"""
+    # Get cleaned data from payment step
+    cleaned_data = wizard.get_cleaned_data_for_step('auto_tweet_step') or {'auto_tweet_operation': 'none'}
+    # Return true
+    return cleaned_data['auto_tweet_operation'] == 'USER'
+
+
 class CreateOrderWizard(SessionWizardView):
     """ CreateOrderWizard
     """
     file_storage = FileSystemStorage(location=os.path.join(getattr(settings, 'MEDIA_ROOT'), 'wizard'))
-    condition_dict = {'relationship_step': toggle_relationship_form, 'auto_tweet_step': toggle_auto_tweet_form}
+    condition_dict = {'relationship_step': toggle_relationship_form,
+                      'auto_tweet_step': toggle_auto_tweet_form,
+                      'auto_tweet_search_step': toggle_auto_tweet_search_form,
+                      'auto_tweet_user_step': toggle_auto_tweet_user_form}
     base_wizard = 'twitter/wizard/'
 
     def __init__(self, *args, **kwargs):
@@ -44,12 +65,11 @@ class CreateOrderWizard(SessionWizardView):
         return ['{0}steps.html'.format(self.base_wizard)]
 
     def get_form_initial(self, step):
-
-        if step in ('relationship_step', 'auto_tweet_step'):
+        if step not in ('order_step', ):
             cleaned_data = self.get_cleaned_data_for_step('order_step')
             init_dict = {}
 
-            if cleaned_data.get('order_type'):
+            if cleaned_data and cleaned_data.get('order_type'):
                 init_dict.update({'operation': cleaned_data.get('order_type').replace('_form', '')})
                 return init_dict
 
@@ -60,7 +80,7 @@ class CreateOrderWizard(SessionWizardView):
 
     def done(self, form_list, **kwargs):
         for form in form_list:
-            if isinstance(form, AutoTweetForm) or isinstance(form, RelationshipForm):
+            if isinstance(form, (AutoTweetUserForm, AutoTweetSearchForm, RelationshipForm)):
                 obj = form.save(commit=False)
                 obj.user = get_object_or_404(Twitter, user=self.request.user)
                 obj.save()

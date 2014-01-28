@@ -15,5 +15,7 @@ class DashboardView(View):
 
     @method_decorator(login_required)
     def get(self, request):
-        orders = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=request.user), run_once=False)
-        return render(request, self.template_name, {'orders': orders})
+        scheduled_orders = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=request.user),
+                                                        run_once=False)
+        orders = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=request.user), run_once=True)
+        return render(request, self.template_name, {'scheduled_orders': scheduled_orders, 'orders': orders})
