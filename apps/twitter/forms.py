@@ -100,7 +100,7 @@ class AutoTweetSearchForm(forms.ModelForm):
     )
     operation = forms.ChoiceField(choices=operation_options, widget=forms.HiddenInput)
 
-    search_by_hash_tag = forms.SlugField(widget=forms.TextInput(attrs={'class': 'form-control'}), help_text=_(
+    search_by_hash_tag = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), help_text=_(
         'Hash Tag will be used to search for tweets desired for retweeting'))
 
     search_style = forms.ChoiceField(choices=search_style_options, widget=forms.Select(attrs={'class': 'form-control'}))
