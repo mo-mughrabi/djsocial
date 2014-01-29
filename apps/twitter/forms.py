@@ -4,6 +4,7 @@ from django import forms
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
+import re
 from tweepy import OAuthHandler
 import tweepy
 from models import ScheduleOrder, Twitter
@@ -121,9 +122,9 @@ class AutoTweetSearchForm(forms.ModelForm):
         super(AutoTweetSearchForm, self).__init__(*args, **kwargs)
 
     def clean_search_by_hash_tag(self):
+        data = self.cleaned_data['search_by_hash_tag']
         # add validation for search field / must be twitter slug compatible
-        data = [self.cleaned_data['search_by_hash_tag'], ]
-        return data
+        return [data, ]
 
     def clean_operation(self):
         # add validation for search field / must be twitter slug compatible
@@ -138,9 +139,11 @@ class AutoTweetSearchForm(forms.ModelForm):
                   'func': cleaned_data.get('operation').replace('_search', ''),
                   'minimum_favorite': cleaned_data.get('minimum_favorite') or None,
                   'minimum_retweet': cleaned_data.get('minimum_retweet') or None}
-
-        label = 'search for {0} and {1} - hourly'.format(' '.join(cleaned_data.get('search_by_hash_tag')),
-                                                         cleaned_data.get('operation').replace('_search', ''))
+        search_hash_tag = cleaned_data.get('search_by_hash_tag')
+        if isinstance(search_hash_tag, list):
+            search_hash_tag = ''.join(search_hash_tag)
+        label = 'search for #{0} and {1} - hourly'.format(search_hash_tag,
+                                                          cleaned_data.get('operation').replace('_search', ''))
         run_once = False
         return func, args, kwargs, label, run_once
 

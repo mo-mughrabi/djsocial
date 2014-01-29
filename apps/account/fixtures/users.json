@@ -4,7 +4,6 @@
         "model": "account.user",
         "fields": {
             "username": "mo",
-            "failed_login_attempt": 0,
             "date_of_birth": null,
             "groups": [2],
             "join_mailing_list": false,

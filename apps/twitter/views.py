@@ -15,5 +15,5 @@ class DashboardView(View):
     def get(self, request):
         scheduled_orders = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=request.user),
                                                         run_once=False)
-        orders = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user), )
+        orders = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user), ).order_by('-status')
         return render(request, self.template_name, {'scheduled_orders': scheduled_orders, 'orders': orders})

@@ -249,6 +249,8 @@ import djcelery
 
 djcelery.setup_loader()
 
+CELERY_ENABLE_UTC = True
+
 # Twitter settings
 TWITTER_CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY', '')
 TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET', '')

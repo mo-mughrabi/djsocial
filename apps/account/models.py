@@ -68,9 +68,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     """
     Accounts/User
     """
-    GENDERS = (
+    gender_options = (
         (u'M', _('Male')),
         (u'F', _('Female')),
+    )
+    threshold_options = (
+        (24, _('1 Per hour')),
+        (48, _('2 Per hour')),
+        (72, _('3 Per hour')),
+        (96, _('4 Per hour')),
     )
     username = models.CharField(_('username'), max_length=30, unique=True,
                                 help_text=_('Letters, numbers and '
@@ -93,13 +99,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     join_mailing_list = models.BooleanField(default=False,
                                             help_text=_('Tick if you wish to receive updates about Twit Robo'))
-    failed_login_attempt = models.IntegerField(_('failed login attempt'), default=0)
 
     # user details and information
     full_name = models.CharField(_('full name'), max_length=30, )
     date_of_birth = models.DateField(_('birthday'), null=True, blank=True)
+    threshold = models.PositiveIntegerField(_('Threshold'), default=48)
 
-    gender = models.CharField(_('gender'), max_length=1, blank=True, null=True, choices=GENDERS)
+    gender = models.CharField(_('gender'), max_length=1, blank=True, null=True, choices=gender_options)
 
     objects = UserManager()
 
