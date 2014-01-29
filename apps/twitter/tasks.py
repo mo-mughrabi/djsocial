@@ -173,6 +173,8 @@ def provision_orders():
                 api = tweepy.API(auth)
                 if order.kwargs['func'] == 'retweet':
                     api.retweet(order.kwargs['tweet_id'])
+                if order.kwargs['func'] == 'favorite':
+                    api.create_favorite(order.kwargs['tweet_id'])
                 order.status = order.COMPLETED
             except tweepy.TweepError:
                 order.status = order.FAILED
@@ -181,72 +183,3 @@ def provision_orders():
 
     logger.info('provision_orders ended successfully')
     return u'Success'
-
-#
-# @task()
-# def follow_back(account_id):
-#     auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-#     account = Twitter.objects.get(pk=account_id)
-#     auth.set_access_token(account.access_token, account.secret_key)
-#     api = tweepy.API(auth)
-#     #user = api.me()
-#
-#     follower_ids = []
-#     for follower in tweepy.Cursor(api.followers).items():
-#         follower_ids.append(follower.id)
-#
-#     friend_ids = []
-#     for friend in tweepy.Cursor(api.friends).items():
-#         friend_ids.append(friend.id)
-#
-#     follow_list = get_diff(follower_ids, friend_ids)
-#
-#     for follower in follow_list:
-#         Order.objects.create(user=account, func='follow_user', args='{},'.format(follower))
-#     return u'Success'
-
-#
-# @task()
-# def unfollow(account_id):
-#     auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-#     account = Twitter.objects.get(pk=account_id)
-#     auth.set_access_token(account.access_token, account.secret_key)
-#     api = tweepy.API(auth)
-#     #user = api.me()
-#
-#     follower_ids = []
-#     for follower in tweepy.Cursor(api.followers).items():
-#         follower_ids.append(follower.id)
-#
-#     friend_ids = []
-#     for friend in tweepy.Cursor(api.friends).items():
-#         friend_ids.append(friend.id)
-#
-#     unfollow_list = get_diff(friend_ids, follower_ids)
-#
-#     for follower in unfollow_list:
-#         Order.objects.create(user=account, func='unfollow_user', args='{},'.format(follower))
-#     return u'Success'
-
-
-# @periodic_task(run_every=crontab(minute="*/5"))
-# def hashtags():
-#     # you have to retreive hastags that last retrieved 2 hours ago
-#     for hashtag in Hashtag.objects.filter(last_time_sync__lt=''):  # aggregate by hashtag
-#         account = hashtag.created_user
-#         auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-#         auth.set_access_token(account.access_token, account.secret_key)
-#         api = tweepy.API(auth)
-#         #user = api.me()
-#         results = api.search(q=hashtag.hash_tag_key)
-#         # sleep
-#
-#         for result in results:
-#             if hashtag.retweet_or_favourite == 'R':
-#                 Order.objects.create(user=account, func='rewteet', args='{},'.format(result.id))
-#             else:
-#                 Order.objects.create(user=account, func='fav', args='{},'.format(result.id))
-#         hashtag.last_time_sync = datetime.datetime.now()
-#         hashtag.save()
-#         time.sleep(10)
-#     return u'Success'
