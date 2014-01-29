@@ -83,7 +83,7 @@ def process_scheduled_orders():
                 last_id = None
 
                 timeline = []
-                for tweet in api.search(q='#{}'.format(order.args[0]), result_type='mixed', count='10'):
+                for tweet in api.search(q=u'{}'.format(order.args[0]), result_type='mixed', count='10'):
                     timeline.append(tweet)
 
                 timeline = filter(lambda status: status.text[0] != "@", timeline)
@@ -112,8 +112,8 @@ def process_scheduled_orders():
                 # for tweet in Cursor(api.search, q='#{}'.format(order.args[1]),
                 #                     since_id=order.data['last_id']).items():
                 timeline = []
-                for tweet in api.search(q='#{}'.format(order.args[0]), result_type='mixed',
-                                        since_id=order.data['last_id'], count='100'):
+                for tweet in api.search(q=u'{}'.format(order.args[0]), result_type='mixed',
+                                        since_id=order.data['last_id'], count='10'):
                     timeline.append(tweet)
 
                 timeline = filter(lambda status: status.text[0] != "@", timeline)
@@ -168,7 +168,14 @@ def provision_orders():
             continue
         for order in Order.objects.filter(status=Order.PENDING, user_id=pending.get('user'))[:1]:
             # only execute one command at a time
-            order.status = order.COMPLETED
+            try:
+                auth.set_access_token(order.user.access_token, order.user.secret_key)
+                api = tweepy.API(auth)
+                if order.kwargs['func'] == 'retweet':
+                    api.retweet(order.kwargs['tweet_id'])
+                order.status = order.COMPLETED
+            except tweepy.TweepError:
+                order.status = order.FAILED
             order.executed_at = datetime.datetime.utcnow().replace(tzinfo=utc)
             order.save()
 
