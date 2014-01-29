@@ -19,6 +19,11 @@ from django.utils import timezone
 logger = get_task_logger(__name__)
 
 
+def get_diff(list1, list2):
+    """Outputs objects which are in list1 but not list 2"""
+    return list(set(list1).difference(set(list2)))
+
+
 @periodic_task(run_every=crontab(minute="*/1"))
 def process_scheduled_orders():
     """ process_scheduled_orders """
@@ -33,9 +38,11 @@ def process_scheduled_orders():
         auth.set_access_token(order.user.access_token, order.user.secret_key)
         api = tweepy.API(auth)
 
-        # black listed words
+        # black listed words / will be discarded when retweeting content or fav
         black_listed_words = ["RT", u"♺"]
-
+        """
+        this section for retweet or favoriate from watched user
+        """
         if order.func in ('retweet_watch', 'favorite_watch'):
             # if user is first timer
             if order.last_run is None:
@@ -76,7 +83,9 @@ def process_scheduled_orders():
                     order.data[user] = last_id or order.data[user]
                     order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
                     order.save()
-
+        """
+        this section for retweet or favoriate from searched keyword
+        """
         if order.func in ('retweet_search', 'favorite_search'):
             # if user is first timer
             if order.last_run is None:
@@ -137,6 +146,50 @@ def process_scheduled_orders():
                 order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
                 order.save()
 
+        if order.func in ('follow', 'unfollow'):
+            # if user is first timer
+
+            follower_ids = []
+            screen_names = {}
+            try:
+                for follower in tweepy.Cursor(api.followers).items():
+                    follower_ids.append(follower.id)
+                    screen_names.update({follower.id: follower.screen_name})
+
+                friend_ids = []
+                for friend in tweepy.Cursor(api.friends).items():
+                    friend_ids.append(friend.id)
+                    screen_names.update({friend.id: friend.screen_name})
+            except tweepy.TweepError as e:
+                order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
+                order.save()
+                continue
+
+            if order.kwargs['func'] == 'follow':
+                follow_list = get_diff(follower_ids, friend_ids)
+
+                for follower in follow_list:
+                    Order.objects.create(user=order.user, func=order.kwargs['func'], args=[follower, ],
+                                         schedule_order=order,
+                                         kwargs={
+                                             'func': order.kwargs['func'],
+                                             'screen_name': screen_names[follower],
+                                             'user_id': follower})
+
+            if order.kwargs['func'] == 'unfollow':
+                unfollow_list = get_diff(friend_ids, follower_ids)
+
+                for follower in unfollow_list:
+                    Order.objects.create(user=order.user, func=order.kwargs['func'], args=[follower, ],
+                                         schedule_order=order,
+                                         kwargs={
+                                             'func': order.kwargs['func'],
+                                             'screen_name': screen_names[follower],
+                                             'user_id': follower})
+
+            order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
+            order.save()
+
     logger.info('process_scheduled_orders ended successfully')
     return u'Success'
 
@@ -175,9 +228,15 @@ def provision_orders():
                     api.retweet(order.kwargs['tweet_id'])
                 if order.kwargs['func'] == 'favorite':
                     api.create_favorite(order.kwargs['tweet_id'])
+                if order.kwargs['func'] == 'follow':
+                    api.create_friendship(order.kwargs['user_id'])
+                if order.kwargs['func'] == 'unfollow':
+                    api.destroy_friendship(order.kwargs['user_id'])
                 order.status = order.COMPLETED
-            except tweepy.TweepError:
+            except tweepy.TweepError as e:
+                #TODO: Handle general erros as fail and RATE LIMIT error for retry
                 order.status = order.FAILED
+                order.result = 'Exception: %s' % str(e)
             order.executed_at = datetime.datetime.utcnow().replace(tzinfo=utc)
             order.save()
 
