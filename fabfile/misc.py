@@ -32,7 +32,7 @@ def _render(template, context=None):
     """
     if context is None:
         context = dict((k.upper(), v) for k, v in env.iteritems())
-        context.update({'CELERY_DEFAULT_QUEUE': 'ts'})
+        context.update({'CELERY_DEFAULT_QUEUE': 'djsocial'})
     return template % context
 
 
