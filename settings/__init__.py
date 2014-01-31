@@ -1,6 +1,7 @@
 # Django settings for twit_bot project / more documentation to be written
 import dj_database_url
 import os
+from kombu import Exchange, Queue
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 
@@ -251,6 +252,9 @@ djcelery.setup_loader()
 
 CELERY_ENABLE_UTC = True
 CELERY_DEFAULT_QUEUE = 'djsocial'
+CELERY_QUEUES = (
+    Queue('djsocial', Exchange('djsocial'), routing_key='djsocial'),
+)
 
 # Twitter settings
 TWITTER_CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY', '')
