@@ -1,0 +1,12 @@
+[program:%(PROJECT_NAME)s_celery]
+command=%(VIRTUALENV)s/bin/python %(PROJECT_PATH)s/manage.py celery worker -Q %(CELERY_DEFAULT_QUEUE)s -B -E --loglevel=INFO
+directory=%(PROJECT_PATH)s
+PYTHONPATH='%(VIRTUALENV)s'
+user=%(USER)s
+numprocs=1
+stdout_logfile=/var/log/%(PROJECT_NAME)s_celeryd.log
+stderr_logfile=/var/log/%(PROJECT_NAME)s_celeryd.log
+autostart=true
+autorestart=true
+startsecs=10
+stopwaitsecs=30
