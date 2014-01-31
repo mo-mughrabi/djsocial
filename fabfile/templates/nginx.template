@@ -1,11 +1,11 @@
-upstream app_server {
+upstream %(PROJECT_NAME)s_server {
     server unix:/home/mmughrabi//%(PROJECT_NAME)s.sock;
 }
 
 server {
     listen 8070;
     client_max_body_size 1G;
-    server_name 127.0.0.1;
+    server_name localhost;
     keepalive_timeout 5;
 
 
@@ -25,7 +25,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
         proxy_redirect off;
-        proxy_pass http://app_server;
+        proxy_pass http://%(PROJECT_NAME)s_server;
     }
 
 }
