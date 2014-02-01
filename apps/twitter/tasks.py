@@ -197,7 +197,7 @@ def process_scheduled_orders():
 @periodic_task(run_every=crontab(minute="*/1"))
 def provision_orders():
     """ provision_orders """
-    logger.debug('provision_orders is starting up')
+    logger.info('provision_orders is starting up')
     auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
 
     # first we get all the pending orders for a given user (users with pending orders > 0)
@@ -214,7 +214,7 @@ def provision_orders():
                                           status__in=(Order.COMPLETED, Order.FAILED), user_id=pending.get('user'))
 
         hour_usage = hour_usage.count()
-        logger.debug('provision_orders: user hourly usage: {}'.format(hour_usage))
+        logger.info('provision_orders: user hourly usage: {0} vs threshold {1}'.format(hour_usage, threshold))
 
         # skip user as he/she reached limit of hourly usage
         if hour_usage > threshold:

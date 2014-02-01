@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from fabric.api import env, task
+from fabric.api import env, task, local
 from fabric.context_managers import cd
 from fabric.operations import require
 from misc import _virtualenv as virtualenv, _sudo as sudo, _run as run, _put_template as put_template
@@ -9,6 +9,9 @@ def deploy():
     """
     """
     require('environment', provided_by=('dev', ))
+    local('git add .')
+    local('git commit -a -m "auto"')
+    local('git push')
     with cd(env.project_path):
         run('git pull')
         run('cp settings/development.py settings/local_env.py')
