@@ -9,7 +9,7 @@ from djorm_pgarray.fields import ArrayField
 from jsonfield import JSONField
 from tweepy import OAuthHandler
 import tweepy
-from managers import TwitterManager, ScheduleOrderManger
+from managers import TwitterManager, ScheduleOrderManger, OrderManager
 
 
 class Twitter(models.Model):
@@ -96,6 +96,8 @@ class Order(models.Model):
     args = ArrayField(dbtype='text', null=True, blank=True)
     kwargs = DictionaryField(null=True, blank=True, db_index=True)
     result = models.TextField(null=True, blank=True)
+
+    objects = OrderManager()
 
     def __unicode__(self):
 

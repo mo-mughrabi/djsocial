@@ -16,4 +16,7 @@ class DashboardView(View):
         scheduled_orders = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=request.user),
                                                         run_once=False)
         orders = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user), ).order_by('-status')
-        return render(request, self.template_name, {'scheduled_orders': scheduled_orders, 'orders': orders})
+        total_pending = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user),
+                                             status=Order.PENDING).count()
+        return render(request, self.template_name,
+                      {'scheduled_orders': scheduled_orders, 'orders': orders, 'total_pending': total_pending})

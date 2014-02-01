@@ -36,7 +36,9 @@
                                         <td>{{ order.get_status_display }}</td>
                                         <td>{{ order.last_run|default_if_none:"Never" }}</td>
                                         <td>{{ order.created_at|timesince }} {% trans 'ago' %}</td>
-                                        <td><button class="btn btn-danger">{% trans 'Delete' %}</button></td>
+                                        <td>
+                                            <button class="btn btn-danger">{% trans 'Delete' %}</button>
+                                        </td>
                                     </tr>
                                 {% endfor %}
 
@@ -48,6 +50,8 @@
                     <div class="tab-pane" id="orders">
                         {% if orders %}
                             <h3>{% trans 'All orders' %}</h3>
+                            <p>{% trans 'Total orders' %} {{ orders.count }}
+                                / {% trans 'Total pending' %} {{ total_pending }}</p>
                             <table class="table table-striped table-bordered">
 
                                 <tr>

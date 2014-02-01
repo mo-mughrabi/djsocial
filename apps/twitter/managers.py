@@ -10,3 +10,8 @@ class TwitterManager(models.Manager):
 
 class ScheduleOrderManger(HStoreManager):
     """ ScheduleOrder """
+
+
+class OrderManager(HStoreManager):
+    """
+    """
