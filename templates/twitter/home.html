@@ -37,7 +37,7 @@
                                         <td>{{ order.last_run|default_if_none:"Never" }}</td>
                                         <td>{{ order.created_at|timesince }} {% trans 'ago' %}</td>
                                         <td>
-                                            <button class="btn btn-danger">{% trans 'Delete' %}</button>
+                                            <a href="{% url 'twitter-delete' order.id %}">{% trans 'Delete' %}</a>
                                         </td>
                                     </tr>
                                 {% endfor %}

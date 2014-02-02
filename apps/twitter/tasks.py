@@ -44,62 +44,11 @@ def process_scheduled_orders():
         this section for retweet or favoriate from watched user
         """
         if order.func in ('retweet_watch', 'favorite_watch'):
-            # if user is first timer
-            if order.last_run is None:
-                for user in order.args:
-                    last_id = None
-                    for tweet in Cursor(api.user_timeline, screen_name=user, include_rts=False).items(5):
-                        if last_id is None:
-                            last_id = tweet.id
-                        Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
-                                             schedule_order=order,
-                                             kwargs={
-                                                 'func': order.kwargs['func'],
-                                                 'tweet': tweet.text.encode('utf-8'),
-                                                 'tweet_id': tweet.id,
-                                                 'source_url': tweet.source_url,
-                                                 'created_at': tweet.created_at,
-                                                 'screen_name': tweet.author.screen_name.encode('utf-8')})
-                    order.data[user] = last_id
-                    order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
-                    order.save()
-            else:
-                # the hourly runs
-                for user in order.args:
-                    last_id = None
-                    for tweet in Cursor(api.user_timeline, screen_name=user, include_rts=False,
-                                        since_id=order.data[user]).items():
-                        if last_id is None:
-                            last_id = tweet.id
-                        Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
-                                             schedule_order=order,
-                                             kwargs={
-                                                 'func': order.kwargs['func'],
-                                                 'tweet': tweet.text.encode('utf-8'),
-                                                 'tweet_id': tweet.id,
-                                                 'source_url': tweet.source_url,
-                                                 'created_at': tweet.created_at,
-                                                 'screen_name': tweet.author.screen_name.encode('utf-8')})
-                    order.data[user] = last_id or order.data[user]
-                    order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
-                    order.save()
-        """
-        this section for retweet or favoriate from searched keyword
-        """
-        if order.func in ('retweet_search', 'favorite_search'):
-            # if user is first timer
-            if order.last_run is None:
+            # the hourly runs
+            for user in order.args:
                 last_id = None
-
-                timeline = []
-                for tweet in api.search(q=u'{}'.format(order.args[0]), result_type='mixed', count='10'):
-                    timeline.append(tweet)
-
-                timeline = filter(lambda status: status.text[0] != "@", timeline)
-                timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
-                                  timeline)
-
-                for tweet in timeline:
+                for tweet in Cursor(api.user_timeline, screen_name=user, include_rts=False,
+                                    since_id=order.data.get(user, '')).items():
                     if last_id is None:
                         last_id = tweet.id
                     Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
@@ -111,40 +60,43 @@ def process_scheduled_orders():
                                              'source_url': tweet.source_url,
                                              'created_at': tweet.created_at,
                                              'screen_name': tweet.author.screen_name.encode('utf-8')})
-                order.data['last_id'] = last_id
+                order.data[user] = last_id or order.data[user]
                 order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
                 order.save()
-            else:
-                # the hourly runs
-                last_id = None
-                logger.debug('Search hashtag: #{}'.format(order.args[0]))
-                # for tweet in Cursor(api.search, q='#{}'.format(order.args[1]),
-                #                     since_id=order.data['last_id']).items():
-                timeline = []
-                for tweet in api.search(q=u'{}'.format(order.args[0]), result_type='mixed',
-                                        since_id=order.data['last_id'], count='10'):
-                    timeline.append(tweet)
+        """
+        this section for retweet or favoriate from searched keyword
+        """
+        if order.func in ('retweet_search', 'favorite_search'):
+            # the hourly runs
+            last_id = None
+            logger.debug('Search hashtag: #{}'.format(order.args[0]))
+            # for tweet in Cursor(api.search, q='#{}'.format(order.args[1]),
+            #                     since_id=order.data['last_id']).items():
+            timeline = []
+            for tweet in api.search(q=u'{}'.format(order.args[0]), result_type='popular',
+                                    since_id=order.data.get('last_id', ''), count='10'):
+                timeline.append(tweet)
 
-                timeline = filter(lambda status: status.text[0] != "@", timeline)
-                timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
-                                  timeline)
+            timeline = filter(lambda status: status.text[0] != "@", timeline)
+            timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
+                              timeline)
 
-                for tweet in timeline:
-                    if last_id is None:
-                        last_id = tweet.id
-                    Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
-                                         schedule_order=order,
-                                         kwargs={
-                                             'func': order.kwargs['func'],
-                                             'tweet': tweet.text,
-                                             'tweet_id': tweet.id,
-                                             'source_url': tweet.source_url,
-                                             'created_at': tweet.created_at,
-                                             'screen_name': tweet.author.screen_name})
+            for tweet in timeline:
+                if last_id is None:
+                    last_id = tweet.id
+                Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
+                                     schedule_order=order,
+                                     kwargs={
+                                         'func': order.kwargs['func'],
+                                         'tweet': tweet.text,
+                                         'tweet_id': tweet.id,
+                                         'source_url': tweet.source_url,
+                                         'created_at': tweet.created_at,
+                                         'screen_name': tweet.author.screen_name})
 
-                order.data['last_id'] = last_id or order.data['last_id']
-                order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
-                order.save()
+            order.data['last_id'] = last_id or order.data['last_id']
+            order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
+            order.save()
 
         if order.func in ('follow', 'unfollow'):
             # if user is first timer

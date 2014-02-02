@@ -35,7 +35,6 @@ requests==2.0.0
 six==1.4.1
 sorl-thumbnail==11.12
 storage==0.0.5a2
-tweepy==2.2
 update-checker==0.6
 wsgiref==0.1.2
 yolk==0.4.3
