@@ -2,6 +2,7 @@
 import dj_database_url
 import os
 from kombu import Exchange, Queue
+import sys
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 
@@ -9,6 +10,7 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardi
 def base(f=''):
     return os.path.join(BASE_DIR, f)
 
+sys.path.insert(0, base('plugins'))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
