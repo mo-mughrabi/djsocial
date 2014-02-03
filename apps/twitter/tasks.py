@@ -52,7 +52,7 @@ def process_scheduled_orders():
                                     since_id=order.data.get(user, '')).items():
                     if last_id is None:
                         last_id = tweet.id
-                    logger.info('TASK DETAILS: %s - %s' % (order, order.kwargs))
+
                     Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
                                          schedule_order=order,
                                          kwargs={
@@ -62,7 +62,7 @@ def process_scheduled_orders():
                                              'source_url': tweet.source_url,
                                              'created_at': tweet.created_at,
                                              'screen_name': tweet.author.screen_name.encode('utf-8')})
-                order.data[user] = last_id or order.data[user]
+                order.data[user] = last_id or order.data.get(user, '')
                 order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
                 order.save()
         """
