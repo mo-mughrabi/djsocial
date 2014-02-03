@@ -42,28 +42,26 @@
                                     </tr>
                                 {% endfor %}
 
-
                             </table>
                         {% else %}
                             <h3>{% trans 'No orders found, create your first here' %}</h3>
                         {% endif %}
 
-                            <div class="pagination">
-                                <span class="step-links">
-                                    {% if scheduled_orders.has_previous %}
-                                        <a href="?page={{ scheduled_orders.previous_page_number }}">Previous</a>
-                                    {% endif %}
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if scheduled_orders.has_previous %}
+                                    <a href="?page={{ scheduled_orders.previous_page_number }}">Previous</a>
+                                {% endif %}
 
-                                    <span class="current">
-                                        Page {{ scheduled_orders.number }} of {{ scheduled_orders.paginator.num_pages }}.
-                                    </span>
-
-                                    {% if scheduled_orders.has_next %}
-                                        <a href="?page={{ scheduled_orders.next_page_number }}">Next</a>
-                                    {% endif %}
+                                <span class="current">
+                                    Page {{ scheduled_orders.number }} of {{ scheduled_orders.paginator.num_pages }}
                                 </span>
-                            </div>
 
+                                {% if scheduled_orders.has_next %}
+                                    <a href="?page={{ scheduled_orders.next_page_number }}">Next</a>
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                     <div class="tab-pane" id="orders">
                         {% if orders %}
