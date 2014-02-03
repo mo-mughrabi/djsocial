@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from celery import task
+import datetime
+
 from celery.schedules import crontab
 from celery.task import periodic_task
-import datetime
 from django.conf import settings
 from celery.utils.log import get_task_logger
-from django.db.models import Q, Count, Max
+from django.db.models import Q, Count
 from pytz import utc
+from django.utils import timezone
+
 from apps.twitter.models import Order, ScheduleOrder
 import tweepy
 from tweepy import OAuthHandler, Cursor
 from models import Twitter
-import time
-from django.utils import timezone
+
 
 # setup logger
 logger = get_task_logger(__name__)
@@ -74,9 +75,13 @@ def process_scheduled_orders():
             # for tweet in Cursor(api.search, q='#{}'.format(order.args[1]),
             #                     since_id=order.data['last_id']).items():
             timeline = []
-            for tweet in api.search(q=u'{}'.format(order.args[0]), result_type='popular',
-                                    since_id=order.data.get('last_id', ''), count='10'):
-                timeline.append(tweet)
+            if order.data.get('last_id', None):
+                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='popular').items(10):
+                    timeline.append(tweet)
+            else:
+                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='popular',
+                                    since_id=order.data['last_id']).items():
+                    timeline.append(tweet)
 
             timeline = filter(lambda status: status.text[0] != "@", timeline)
             timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),

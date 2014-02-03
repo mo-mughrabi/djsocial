@@ -21,12 +21,18 @@ class Command(BaseCommand):
         api = tweepy.API(auth)
 
         last_id = None
-
-        for tweet in api.search(q='shemale', result_type='mixed', since_id='428429007902998528', count='100'):
-            print '--- new tweet ---'
-            print tweet.text
-            print tweet.id
-            print tweet.author.screen_name
+        i = 0
+        x = None
+        for tweet in Cursor(api.search, q='kuwait', result_type='popular', since_id='').items():
+            i = i +1
+            print tweet.id, tweet.author.screen_name
+            print i
+            print '+++++++++++++'
+        # for tweet in api.search(q='shemale', result_type='mixed', since_id='428429007902998528', count='100'):
+        #     print '--- new tweet ---'
+        #     print tweet.text
+        #     print tweet.id
+        #     print tweet.author.screen_name
 
         # for tweet in Cursor(api.user_timeline, screen_name='xxx', include_rts=False).items(10):
         #     if last_id is None:
