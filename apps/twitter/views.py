@@ -44,9 +44,19 @@ class OrderView(View):
 
     @method_decorator(login_required)
     def get(self, request):
-        orders = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user), ).order_by('-status')
+        orders_list = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user), ).order_by('-status')
         total_pending = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user),
                                              status=Order.PENDING).count()
+
+        paginator = Paginator(orders_list, 3)
+        page = request.GET.get('page')
+
+        try:
+            orders = paginator.page(page)
+        except PageNotAnInteger:
+            orders = paginator.page(1)
+        except EmptyPage:
+            orders = paginator.page(paginator.num_pages)
 
         return render(request, self.template_name,
                       {'orders': orders, 'total_pending': total_pending})
