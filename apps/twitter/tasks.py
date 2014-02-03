@@ -109,7 +109,7 @@ def process_scheduled_orders():
                                              'created_at': tweet.created_at,
                                              'screen_name': tweet.author.screen_name})
                 except :
-                    logger.info('AM IN RETWEET_WATCH')
+                    logger.info('AM IN SEARCH')
                     logger.info('ERROR: %s' % order)
                     logger.info('ERROR: %s' % order.user)
                     logger.info('ERROR: %s' % tweet.id)
