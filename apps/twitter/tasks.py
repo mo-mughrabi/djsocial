@@ -37,6 +37,7 @@ def process_scheduled_orders():
         logger.debug('Order details: {}'.format(order.id))
         auth.set_access_token(order.user.access_token, order.user.secret_key)
         api = tweepy.API(auth)
+        me = api.me()
 
         # black listed words / will be discarded when retweeting content or fav
         black_listed_words = ["RT", u"♺"]
@@ -80,6 +81,8 @@ def process_scheduled_orders():
             timeline = filter(lambda status: status.text[0] != "@", timeline)
             timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
                               timeline)
+            # exclude self 
+            timeline = filter(lambda status: status.author.id != me.id, timeline)
 
             for tweet in timeline:
                 if last_id is None:
