@@ -54,15 +54,15 @@ def process_scheduled_orders():
                         last_id = tweet.id
                     logger.info('TASK DETAILS (WATCH): %s' % order.kwargs['func'])
 
-                    Order.objects.create(user=order.user, func='XXXX', args=[tweet.id, ],
+                    Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
                                          schedule_order=order,
                                          kwargs={
                                              'func': order.kwargs['func'],
-                                             'tweet': tweet.text.encode('utf-8'),
+                                             'tweet': tweet.text,
                                              'tweet_id': tweet.id,
                                              'source_url': tweet.source_url,
                                              'created_at': tweet.created_at,
-                                             'screen_name': tweet.author.screen_name.encode('utf-8')})
+                                             'screen_name': tweet.author.screen_name})
                 order.data[user] = last_id or order.data.get(user, '')
                 order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
                 order.save()
@@ -106,7 +106,7 @@ def process_scheduled_orders():
                 if last_id is None:
                     last_id = tweet.id
                 logger.info('TASK DETAILS: %s' % order.kwargs['func'])
-                Order.objects.create(user=order.user, func='XXXX', args=[tweet.id, ],
+                Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
                                      schedule_order=order,
                                      kwargs={
                                          'func': order.kwargs['func'],
@@ -168,51 +168,51 @@ def process_scheduled_orders():
     return u'Success'
 
 
-# @periodic_task(run_every=crontab(minute="*/1"))
-# def provision_orders():
-#     """ provision_orders """
-#     logger.info('provision_orders is starting up')
-#     auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-#
-#     # first we get all the pending orders for a given user (users with pending orders > 0)
-#     for pending in Order.objects.values('user').filter(status=Order.PENDING).annotate(user_count=Count('user')).filter(
-#             user_count__gt=0):
-#         # get user threshold
-#         user_threshold = Twitter.objects.get(pk=pending.get('user')).user.threshold
-#         threshold = user_threshold / 24  # per hour
-#         now = timezone.localtime(timezone.now(), timezone.get_current_timezone())
-#         # get user hourly usage / return total number of executed commands in the given hour of the day
-#         # if hours do not exceed user threshold we continue
-#         hour_usage = Order.objects.filter(executed_at__year=now.year, executed_at__month=now.month,
-#                                           executed_at__day=now.day, executed_at__hour=now.hour,
-#                                           status__in=(Order.COMPLETED, Order.FAILED), user_id=pending.get('user'))
-#
-#         hour_usage = hour_usage.count()
-#         logger.info('provision_orders: user hourly usage: {0} vs threshold {1}'.format(hour_usage, threshold))
-#
-#         # skip user as he/she reached limit of hourly usage
-#         if hour_usage > threshold:
-#             continue
-#         for order in Order.objects.filter(status=Order.PENDING, user_id=pending.get('user'))[:1]:
-#             # only execute one command at a time
-#             try:
-#                 auth.set_access_token(order.user.access_token, order.user.secret_key)
-#                 api = tweepy.API(auth)
-#                 if order.kwargs['func'] == 'retweet':
-#                     api.retweet(order.kwargs['tweet_id'])
-#                 if order.kwargs['func'] == 'favorite':
-#                     api.create_favorite(order.kwargs['tweet_id'])
-#                 if order.kwargs['func'] == 'follow':
-#                     api.create_friendship(order.kwargs['user_id'])
-#                 if order.kwargs['func'] == 'unfollow':
-#                     api.destroy_friendship(order.kwargs['user_id'])
-#                 order.status = order.COMPLETED
-#             except tweepy.TweepError as e:
-#                 #TODO: Handle general erros as fail and RATE LIMIT error for retry
-#                 order.status = order.FAILED
-#                 order.result = 'Exception: %s' % str(e)
-#             order.executed_at = datetime.datetime.utcnow().replace(tzinfo=utc)
-#             order.save()
-#
-#     logger.info('provision_orders ended successfully')
-#     return u'Success'
+@periodic_task(run_every=crontab(minute="*/1"))
+def provision_orders():
+    """ provision_orders """
+    logger.info('provision_orders is starting up')
+    auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
+
+    # first we get all the pending orders for a given user (users with pending orders > 0)
+    for pending in Order.objects.values('user').filter(status=Order.PENDING).annotate(user_count=Count('user')).filter(
+            user_count__gt=0):
+        # get user threshold
+        user_threshold = Twitter.objects.get(pk=pending.get('user')).user.threshold
+        threshold = user_threshold / 24  # per hour
+        now = timezone.localtime(timezone.now(), timezone.get_current_timezone())
+        # get user hourly usage / return total number of executed commands in the given hour of the day
+        # if hours do not exceed user threshold we continue
+        hour_usage = Order.objects.filter(executed_at__year=now.year, executed_at__month=now.month,
+                                          executed_at__day=now.day, executed_at__hour=now.hour,
+                                          status__in=(Order.COMPLETED, Order.FAILED), user_id=pending.get('user'))
+
+        hour_usage = hour_usage.count()
+        logger.info('provision_orders: user hourly usage: {0} vs threshold {1}'.format(hour_usage, threshold))
+
+        # skip user as he/she reached limit of hourly usage
+        if hour_usage > threshold:
+            continue
+        for order in Order.objects.filter(status=Order.PENDING, user_id=pending.get('user'))[:1]:
+            # only execute one command at a time
+            try:
+                auth.set_access_token(order.user.access_token, order.user.secret_key)
+                api = tweepy.API(auth)
+                if order.kwargs['func'] == 'retweet':
+                    api.retweet(order.kwargs['tweet_id'])
+                if order.kwargs['func'] == 'favorite':
+                    api.create_favorite(order.kwargs['tweet_id'])
+                if order.kwargs['func'] == 'follow':
+                    api.create_friendship(order.kwargs['user_id'])
+                if order.kwargs['func'] == 'unfollow':
+                    api.destroy_friendship(order.kwargs['user_id'])
+                order.status = order.COMPLETED
+            except tweepy.TweepError as e:
+                #TODO: Handle general erros as fail and RATE LIMIT error for retry
+                order.status = order.FAILED
+                order.result = 'Exception: %s' % str(e)
+            order.executed_at = datetime.datetime.utcnow().replace(tzinfo=utc)
+            order.save()
+
+    logger.info('provision_orders ended successfully')
+    return u'Success'
