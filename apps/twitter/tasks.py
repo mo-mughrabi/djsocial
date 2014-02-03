@@ -75,12 +75,12 @@ def process_scheduled_orders():
             # for tweet in Cursor(api.search, q='#{}'.format(order.args[1]),
             #                     since_id=order.data['last_id']).items():
             timeline = []
-            if order.data.get('last_id', None):
-                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='popular').items(10):
-                    timeline.append(tweet)
-            else:
+            if 'last_id' in order.data:
                 for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='popular',
                                     since_id=order.data['last_id']).items():
+                    timeline.append(tweet)
+            else:
+                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='popular').items(10):
                     timeline.append(tweet)
 
             timeline = filter(lambda status: status.text[0] != "@", timeline)
