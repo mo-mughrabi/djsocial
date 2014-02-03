@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
-from django.http import Http404
 from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic import DeleteView
 from django.views.generic.base import View
-from models import Twitter, ScheduleOrder, Order
 from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
 
+from models import Twitter, ScheduleOrder, Order
 
-class DashboardView(View):
+
+class ScheduleOrderView(View):
     """  """
-    template_name = 'twitter/home.html'
+    template_name = 'twitter/schedule_order.html'
 
     @method_decorator(login_required)
     def get(self, request):
         scheduled_orders_list = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=request.user),
-                                                        run_once=False)
+                                                             run_once=False)
         orders = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user), ).order_by('-status')
         total_pending = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user),
                                              status=Order.PENDING).count()
@@ -35,6 +36,20 @@ class DashboardView(View):
 
         return render(request, self.template_name,
                       {'scheduled_orders': scheduled_orders, 'orders': orders, 'total_pending': total_pending})
+
+
+class OrderView(View):
+    """  """
+    template_name = 'twitter/order.html'
+
+    @method_decorator(login_required)
+    def get(self, request):
+        orders = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user), ).order_by('-status')
+        total_pending = Order.objects.filter(user=get_object_or_404(Twitter, user=request.user),
+                                             status=Order.PENDING).count()
+
+        return render(request, self.template_name,
+                      {'orders': orders, 'total_pending': total_pending})
 
 
 class DeleteScheduleOrderView(DeleteView):
