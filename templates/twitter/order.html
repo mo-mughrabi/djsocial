@@ -18,14 +18,18 @@
                         <table class="table table-striped table-bordered">
 
                             <tr>
-                                <td>{% trans 'Order' %}</td>
+                                <td>{% trans 'Function' %}</td>
+                                <td>{% trans 'Tweet' %}</td>
+                                <td>{% trans 'Author' %}</td>
                                 <td>{% trans 'Status' %}</td>
                                 <td>{% trans 'Created' %}</td>
                             </tr>
 
                             {% for order in orders %}
                                 <tr>
-                                    <td>{{ order }}</td>
+                                    <td>{{ order.func }}</td>
+                                    <td>{{ order.tweet }}</td>
+                                    <td>{{ order.screen_name }}</td>
                                     <td>{{ order.get_status_display }}</td>
                                     <td>{{ order.created_at|timesince }} {% trans 'ago' %}</td>
                                 </tr>

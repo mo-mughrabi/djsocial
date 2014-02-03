@@ -81,7 +81,7 @@ def process_scheduled_orders():
             timeline = filter(lambda status: status.text[0] != "@", timeline)
             timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
                               timeline)
-            # exclude self 
+            # exclude self
             timeline = filter(lambda status: status.author.id != me.id, timeline)
 
             for tweet in timeline:
@@ -97,7 +97,7 @@ def process_scheduled_orders():
                                          'created_at': tweet.created_at,
                                          'screen_name': tweet.author.screen_name})
 
-            order.data['last_id'] = last_id or order.data['last_id']
+            order.data['last_id'] = last_id or order.data.get('last_id', '')
             order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
             order.save()
 
