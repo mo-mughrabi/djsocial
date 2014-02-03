@@ -58,11 +58,11 @@ def process_scheduled_orders():
                                          schedule_order=order,
                                          kwargs={
                                              'func': order.kwargs['func'],
-                                             'tweet': tweet.text,
+                                             'tweet': tweet.text.encode('utf-8'),
                                              'tweet_id': tweet.id,
                                              'source_url': tweet.source_url,
                                              'created_at': tweet.created_at,
-                                             'screen_name': tweet.author.screen_name})
+                                             'screen_name': tweet.author.screen_name.encode('utf-8')})
                 order.data[user] = last_id or order.data.get(user, '')
                 order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
                 order.save()
@@ -110,11 +110,11 @@ def process_scheduled_orders():
                                      schedule_order=order,
                                      kwargs={
                                          'func': order.kwargs['func'],
-                                         'tweet': tweet.text,
+                                         'tweet': tweet.text.encode('utf-8'),
                                          'tweet_id': tweet.id,
                                          'source_url': tweet.source_url,
                                          'created_at': tweet.created_at,
-                                         'screen_name': tweet.author.screen_name})
+                                         'screen_name': tweet.author.screen_name.encode('utf-8')})
             if last_id:
                 order.data['last_id'] = last_id
             order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -147,7 +147,7 @@ def process_scheduled_orders():
                                          schedule_order=order,
                                          kwargs={
                                              'func': order.kwargs['func'],
-                                             'screen_name': screen_names[follower],
+                                             'screen_name': screen_names[follower].encode('utf-8'),
                                              'user_id': follower})
 
             if order.kwargs['func'] == 'unfollow':
