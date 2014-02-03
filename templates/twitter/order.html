@@ -28,8 +28,8 @@
                             {% for order in orders %}
                                 <tr>
                                     <td>{{ order.func }}</td>
-                                    <td>{{ order.tweet }}</td>
-                                    <td>{{ order.screen_name }}</td>
+                                    <td>{{ order.kwargs_tweet }}</td>
+                                    <td>{{ order.kwargs_screen_name }}</td>
                                     <td>{{ order.get_status_display }}</td>
                                     <td>{{ order.created_at|timesince }} {% trans 'ago' %}</td>
                                 </tr>

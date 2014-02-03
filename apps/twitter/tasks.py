@@ -52,8 +52,6 @@ def process_scheduled_orders():
                                     since_id=order.data.get(user, '')).items():
                     if last_id is None:
                         last_id = tweet.id
-                    logger.info('TASK DETAILS (WATCH): %s' % order.kwargs['func'])
-                    logger.info('TASK DETAILS (OUT): %s' % tweet.author.screen_name.encode('utf-8'))
                     Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
                                          schedule_order=order,
                                          kwargs={
@@ -105,8 +103,6 @@ def process_scheduled_orders():
             for tweet in timeline:
                 if last_id is None:
                     last_id = tweet.id
-                logger.info('TASK DETAILS: %s' % order.kwargs['func'])
-                #favourite
                 Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
                                      schedule_order=order,
                                      kwargs={
