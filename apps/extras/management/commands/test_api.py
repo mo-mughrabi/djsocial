@@ -16,19 +16,35 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-        account = Twitter.objects.get(pk=1)
+        account = Twitter.objects.get(pk=5)
         auth.set_access_token(account.access_token, account.secret_key)
         api = tweepy.API(auth)
-
+        me = api.me()
+        print me.__dict__
         last_id = None
         i = 0
         x = None
-        for tweet in Cursor(api.search, q='@shemalewiki', result_type='mixed', since_id='').items():
-            i = i + 1
-            print tweet.id, tweet.author.screen_name
-            print i
-            print '+++++++++++++'
-        # for tweet in api.search(q='shemale', result_type='mixed', since_id='428429007902998528', count='100'):
+        timeline = []
+        black_listed_words = ["RT", u"♺"]
+        for tweet in Cursor(api.search, q='@shemalewiki', result_type='mixed', rpp=100).items(200):
+            timeline.append(tweet)
+            timeline = filter(lambda status: status.text[0] != "@", timeline)
+            timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
+                              timeline)
+            # exclude self
+            timeline = filter(lambda status: status.author.id != me.id, timeline)
+
+            if len(timeline) >= 100:
+                break
+
+
+        for tweet in timeline:
+            print tweet.id
+            print tweet.text
+            print tweet.author.screen_name
+            print tweet.author.id
+            print '++++++++++++++++++++++'
+                    # for tweet in api.search(q='shemale', result_type='mixed', since_id='428429007902998528', count='100'):
         #     print '--- new tweet ---'
         #     print tweet.text
         #     print tweet.id

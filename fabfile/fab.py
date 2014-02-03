@@ -19,7 +19,8 @@ def deploy():
 
     virtualenv('python manage.py migrate')
 
-    sudo('sudo supervisorctl restart all')
+    sudo('sudo supervisorctl restart djsocial')
+    sudo('sudo supervisorctl restart djsocial_celery')
 
 
 @task()
