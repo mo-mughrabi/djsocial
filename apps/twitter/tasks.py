@@ -63,6 +63,7 @@ def process_scheduled_orders():
                                                  'created_at': tweet.created_at,
                                                  'screen_name': tweet.author.screen_name.encode('utf-8')})
                     except :
+                        logger.info('AM IN RETWEET_WATCH')
                         logger.info('ERROR: %s' % order)
                         logger.info('ERROR: %s' % order.user)
                         logger.info('ERROR: %s' % tweet.id)
@@ -97,17 +98,22 @@ def process_scheduled_orders():
             for tweet in timeline:
                 if last_id is None:
                     last_id = tweet.id
-
-                Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
-                                     schedule_order=order,
-                                     kwargs={
-                                         'func': order.kwargs['func'],
-                                         'tweet': tweet.text,
-                                         'tweet_id': tweet.id,
-                                         'source_url': tweet.source_url,
-                                         'created_at': tweet.created_at,
-                                         'screen_name': tweet.author.screen_name})
-
+                try:
+                    Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
+                                         schedule_order=order,
+                                         kwargs={
+                                             'func': order.kwargs['func'],
+                                             'tweet': tweet.text,
+                                             'tweet_id': tweet.id,
+                                             'source_url': tweet.source_url,
+                                             'created_at': tweet.created_at,
+                                             'screen_name': tweet.author.screen_name})
+                except :
+                    logger.info('AM IN RETWEET_WATCH')
+                    logger.info('ERROR: %s' % order)
+                    logger.info('ERROR: %s' % order.user)
+                    logger.info('ERROR: %s' % tweet.id)
+                    logger.info('ERROR: %s' % order.kwargs['func'])
             order.data['last_id'] = last_id or order.data.get('last_id', '')
             order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
             order.save()
