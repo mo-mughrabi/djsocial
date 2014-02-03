@@ -23,7 +23,7 @@ class Command(BaseCommand):
         last_id = None
         i = 0
         x = None
-        for tweet in Cursor(api.search, q='kuwait', result_type='popular', since_id='').items():
+        for tweet in Cursor(api.search, q='@shemalewiki', result_type='mixed', since_id='').items():
             i = i + 1
             print tweet.id, tweet.author.screen_name
             print i
