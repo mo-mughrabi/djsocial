@@ -14,7 +14,6 @@ def deploy():
     local('git push')
     with cd(env.project_path):
         run('git pull')
-        virtualenv('pip uninstall tweepy')
         run('cp settings/development.py settings/local_env.py')
         virtualenv('pip install -r %(PROJECT_PATH)srequirements.txt')
 
