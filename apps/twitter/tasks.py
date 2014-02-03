@@ -100,19 +100,11 @@ def process_scheduled_orders():
 
                     if len(timeline) >= 10:
                         break
-                        # for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='mixed').items(10):
-                        #     timeline.append(tweet)
-
-            timeline = filter(lambda status: status.text[0] != "@", timeline)
-            timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
-                              timeline)
-            # exclude self
-            timeline = filter(lambda status: status.author.id != me.id, timeline)
 
             for tweet in timeline:
                 if last_id is None:
                     last_id = tweet.id
-
+                logger.info('TASK DETAILS: %s' % order.kwargs['func'])
                 Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
                                      schedule_order=order,
                                      kwargs={
