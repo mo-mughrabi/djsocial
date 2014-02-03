@@ -52,22 +52,16 @@ def process_scheduled_orders():
                                     since_id=order.data.get(user, '')).items():
                     if last_id is None:
                         last_id = tweet.id
-                    try:
-                        Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
-                                             schedule_order=order,
-                                             kwargs={
-                                                 'func': order.kwargs['func'],
-                                                 'tweet': tweet.text.encode('utf-8'),
-                                                 'tweet_id': tweet.id,
-                                                 'source_url': tweet.source_url,
-                                                 'created_at': tweet.created_at,
-                                                 'screen_name': tweet.author.screen_name.encode('utf-8')})
-                    except :
-                        logger.info('AM IN RETWEET_WATCH')
-                        logger.info('ERROR: %s' % order)
-                        logger.info('ERROR: %s' % order.user)
-                        logger.info('ERROR: %s' % tweet.id)
-                        logger.info('ERROR: %s' % order.kwargs['func'])
+
+                    Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
+                                         schedule_order=order,
+                                         kwargs={
+                                             'func': order.kwargs['func'],
+                                             'tweet': tweet.text.encode('utf-8'),
+                                             'tweet_id': tweet.id,
+                                             'source_url': tweet.source_url,
+                                             'created_at': tweet.created_at,
+                                             'screen_name': tweet.author.screen_name.encode('utf-8')})
                 order.data[user] = last_id or order.data.get(user, '')
                 order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
                 order.save()
@@ -82,12 +76,32 @@ def process_scheduled_orders():
             #                     since_id=order.data['last_id']).items():
             timeline = []
             if 'last_id' in order.data:
-                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='mixed',
+                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='mixed', rpp=100,
                                     since_id=order.data['last_id']).items():
                     timeline.append(tweet)
+                    timeline = filter(lambda status: status.text[0] != "@", timeline)
+                    timeline = filter(
+                        lambda status: not any(word in status.text.split() for word in black_listed_words),
+                        timeline)
+                    # exclude self
+                    timeline = filter(lambda status: status.author.id != me.id, timeline)
+
+                    if len(timeline) >= 50:
+                        break
             else:
-                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='mixed').items(10):
+                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='mixed', rpp=100).items(200):
                     timeline.append(tweet)
+                    timeline = filter(lambda status: status.text[0] != "@", timeline)
+                    timeline = filter(
+                        lambda status: not any(word in status.text.split() for word in black_listed_words),
+                        timeline)
+                    # exclude self
+                    timeline = filter(lambda status: status.author.id != me.id, timeline)
+
+                    if len(timeline) >= 10:
+                        break
+                        # for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='mixed').items(10):
+                        #     timeline.append(tweet)
 
             timeline = filter(lambda status: status.text[0] != "@", timeline)
             timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
@@ -98,24 +112,18 @@ def process_scheduled_orders():
             for tweet in timeline:
                 if last_id is None:
                     last_id = tweet.id
-                try:
-                    Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
-                                         schedule_order=order,
-                                         kwargs={
-                                             'func': order.kwargs['func'],
-                                             'tweet': tweet.text,
-                                             'tweet_id': tweet.id,
-                                             'source_url': tweet.source_url,
-                                             'created_at': tweet.created_at,
-                                             'screen_name': tweet.author.screen_name})
-                except :
-                    logger.info('AM IN SEARCH')
-                    logger.info('ERROR: %s' % order)
-                    logger.info('ERROR: %s' % order.user)
-                    logger.info('ERROR: %s' % tweet.id)
-                    logger.info('ERROR: %s' % order.kwargs['func'])
 
-            order.data['last_id'] = last_id or order.data.get('last_id', '')
+                Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
+                                     schedule_order=order,
+                                     kwargs={
+                                         'func': order.kwargs['func'],
+                                         'tweet': tweet.text,
+                                         'tweet_id': tweet.id,
+                                         'source_url': tweet.source_url,
+                                         'created_at': tweet.created_at,
+                                         'screen_name': tweet.author.screen_name})
+            if last_id:
+                order.data['last_id'] = last_id
             order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
             order.save()
 
