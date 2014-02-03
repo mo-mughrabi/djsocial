@@ -26,16 +26,20 @@ class Command(BaseCommand):
         x = None
         timeline = []
         black_listed_words = ["RT", u"♺"]
-        for tweet in Cursor(api.search, q='@shemalewiki', result_type='mixed', rpp=100).items(200):
-            timeline.append(tweet)
-            timeline = filter(lambda status: status.text[0] != "@", timeline)
-            timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
-                              timeline)
-            # exclude self
-            timeline = filter(lambda status: status.author.id != me.id, timeline)
+        try:
+            for tweet in Cursor(api.search, q='@shemalewiki', result_type='mixed', rpp=100).items(200):
+                timeline.append(tweet)
+                timeline = filter(lambda status: status.text[0] != "@", timeline)
+                timeline = filter(lambda status: not any(word in status.text.split() for word in black_listed_words),
+                                  timeline)
+                # exclude self
+                timeline = filter(lambda status: status.author.id != me.id, timeline)
 
-            if len(timeline) >= 100:
-                break
+                if len(timeline) >= 100:
+                    break
+        except tweepy.TweepError as e:
+            print e
+
 
 
         for tweet in timeline:
