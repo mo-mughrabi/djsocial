@@ -92,7 +92,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     executed_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=2, choices=status_options, default=PENDING)
-    func = models.CharField(max_length=200, choices=function_options)
+    func = models.CharField(max_length=200, )
     args = ArrayField(dbtype='text', null=True, blank=True)
     kwargs = DictionaryField(null=True, blank=True, db_index=True)
     result = models.TextField(null=True, blank=True)
