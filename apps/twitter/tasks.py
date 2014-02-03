@@ -82,11 +82,11 @@ def process_scheduled_orders():
             #                     since_id=order.data['last_id']).items():
             timeline = []
             if 'last_id' in order.data:
-                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='popular',
+                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='mixed',
                                     since_id=order.data['last_id']).items():
                     timeline.append(tweet)
             else:
-                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='popular').items(10):
+                for tweet in Cursor(api.search, q=u'{}'.format(order.args[0]), result_type='mixed').items(10):
                     timeline.append(tweet)
 
             timeline = filter(lambda status: status.text[0] != "@", timeline)
@@ -114,6 +114,7 @@ def process_scheduled_orders():
                     logger.info('ERROR: %s' % order.user)
                     logger.info('ERROR: %s' % tweet.id)
                     logger.info('ERROR: %s' % order.kwargs['func'])
+
             order.data['last_id'] = last_id or order.data.get('last_id', '')
             order.last_run = datetime.datetime.utcnow().replace(tzinfo=utc)
             order.save()
