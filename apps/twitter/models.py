@@ -108,21 +108,14 @@ class Order(models.Model):
             return u'%s' % self.func
 
     @property
-    def tweet(self):
+    def kwargs_tweet(self):
         try:
             return self.kwargs['tweet']
         except:
             return None
 
     @property
-    def func(self):
-        try:
-            return self.kwargs['func']
-        except:
-            return None
-
-    @property
-    def screen_name(self):
+    def kwargs_screen_name(self):
         try:
             return self.kwargs['screen_name']
         except:
