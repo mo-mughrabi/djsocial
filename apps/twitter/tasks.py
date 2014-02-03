@@ -105,7 +105,7 @@ def process_scheduled_orders():
                 if last_id is None:
                     last_id = tweet.id
                 logger.info('TASK DETAILS: %s' % order.kwargs['func'])
-                Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
+                Order.objects.create(user=order.user, func='%s' % order.kwargs['func'], args=[tweet.id, ],
                                      schedule_order=order,
                                      kwargs={
                                          'func': order.kwargs['func'],
