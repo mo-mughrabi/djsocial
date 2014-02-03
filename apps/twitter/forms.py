@@ -142,8 +142,8 @@ class AutoTweetSearchForm(forms.ModelForm):
         search_hash_tag = cleaned_data.get('search_by_hash_tag')
         if isinstance(search_hash_tag, list):
             search_hash_tag = ''.join(search_hash_tag)
-        label = 'search for #{0} and {1} - hourly'.format(search_hash_tag,
-                                                          cleaned_data.get('operation').replace('_search', ''))
+        label = 'search for {0} and {1} - hourly'.format(search_hash_tag,
+                                                         cleaned_data.get('operation').replace('_search', ''))
         run_once = False
         return func, args, kwargs, label, run_once
 
