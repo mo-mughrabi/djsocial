@@ -107,18 +107,23 @@ class Order(models.Model):
         except KeyError:
             return u'%s' % self.func
 
-    def run_order(self):
-        # execute operation based on type and args
-        auth = OAuthHandler(getattr(settings, 'TWITTER_CONSUMER_KEY'), getattr(settings, 'TWITTER_CONSUMER_SECRET'))
-        auth.set_access_token(self.user.access_token, self.user.secret_key)
-        api = tweepy.API(auth)
+    @property
+    def tweet(self):
+        try:
+            return self.kwargs['tweet']
+        except:
+            return None
 
-        if self.func == 'follow_user':
-            api.create_friendship(*self.args)
-        if self.func == 'unfollow_user':
-            api.destroy_friendship(*self.args)
-        if self.func == 'retweet':
-            api.retweet(*self.args)
-        if self.func == 'favourite':
-            api.create_favorite(*self.args)
+    @property
+    def func(self):
+        try:
+            return self.kwargs['func']
+        except:
+            return None
 
+    @property
+    def screen_name(self):
+        try:
+            return self.kwargs['screen_name']
+        except:
+            return None
