@@ -48,8 +48,10 @@ def process_scheduled_orders():
             # the hourly runs
             for user in order.args:
                 last_id = None
-                for tweet in Cursor(api.user_timeline, screen_name=user, include_rts=False,
-                                    since_id=order.data.get(user, '')).items():
+                kwargs = {'screen_name': user, 'include_rts': False}
+                if user in order.data:
+                    kwargs.update({'since_id': order.data.get[user]})
+                for tweet in Cursor(api.user_timeline, **kwargs).items():
                     if last_id is None:
                         last_id = tweet.id
                     Order.objects.create(user=order.user, func=order.kwargs['func'], args=[tweet.id, ],
