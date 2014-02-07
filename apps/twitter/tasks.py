@@ -209,6 +209,8 @@ def provision_orders():
         for order in Order.objects.filter(status=Order.PENDING, user_id=pending.get('user'))[:1]:
             # only execute one command at a time
             try:
+                logger.info(
+                    'Executing order {0}: to {1} for user {2}'.format(order.id, order.kwargs['func'], order.user))
                 auth.set_access_token(order.user.access_token, order.user.secret_key)
                 api = tweepy.API(auth)
                 if order.kwargs['func'] == 'retweet':
