@@ -14,6 +14,7 @@ from apps.twitter.models import Order, ScheduleOrder
 import tweepy
 from tweepy import OAuthHandler, Cursor
 from models import Twitter
+from djorm_hstore.expressions import HstoreExpression as HE
 
 
 # setup logger
@@ -107,6 +108,13 @@ def process_scheduled_orders():
 
                     if len(timeline) >= 10:
                         break
+
+            # remove duplicated tweets
+            for tweet in timeline:
+                tweeted = Order.objects.filter(func='retweet', user=order.user).where(
+                    HE("kwargs").contains({'tweet': tweet.text.encode('utf-8')}))
+                tweeted_ids = [t.id for t in tweeted]
+                timeline = filter(lambda status: status.id in tweeted_ids, timeline)
 
             for tweet in timeline:
                 if last_id is None:
