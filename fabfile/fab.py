@@ -27,11 +27,11 @@ def deploy():
 def dev():
     """ Set development environment """
     env.environment = 'development'
-    env.hosts = ['172.16.178.4', ]
-    env.user = 'mmughrabi'
-    env.password = 'frogman123'
-    env.project_path = '/home/mmughrabi/projects/djsocial-env/djsocial/'
-    env.virtualenv = '/home/mmughrabi/projects/djsocial-env'
+    env.hosts = ['0.0.0.0', ]
+    env.user = 'ubuntu'
+    env.password = 'password'
+    env.project_path = '/home/ubuntu/projects/djsocial-env/djsocial/'
+    env.virtualenv = '/home/ubuntu/projects/djsocial-env'
     env.project_name = 'djsocial'
     env.fabfile = 'fabfile'
 

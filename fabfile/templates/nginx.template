@@ -1,5 +1,5 @@
 upstream %(PROJECT_NAME)s_server {
-    server unix:/home/mmughrabi//%(PROJECT_NAME)s.sock;
+    server unix:/home/ubuntu//%(PROJECT_NAME)s.sock;
 }
 
 server {
