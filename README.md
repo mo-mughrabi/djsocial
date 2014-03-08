@@ -38,12 +38,15 @@ Note that you need to edit the file  settings/local_env.py with :
     * Database credentials
     * Twitter app cosumer key and secret
     * Amazon access Key and Secret
+
+To execute scheduled tasks, celery needs to be running (rabbitmq required):
+    >>> python manage.py celery worker -Q djsocial -B -E --loglevel=INFO
     
 Contributors
 -----
 
     * Mo Mughrabi - Lead developer
-    * Ahmed Elhamidi
+    * Ahmed Elhamidi - Developer
     * Mariusz Kosakowski - Developer
 
 
