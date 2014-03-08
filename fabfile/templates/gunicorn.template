@@ -1,5 +1,5 @@
 [program:%(PROJECT_NAME)s]
-command=%(VIRTUALENV)s/bin/gunicorn wsgi:application --bind unix:/home/mmughrabi/%(PROJECT_NAME)s.sock
+command=%(VIRTUALENV)s/bin/gunicorn wsgi:application --bind unix:/home/ubuntu/%(PROJECT_NAME)s.sock
 directory=%(PROJECT_PATH)s
 user=%(USER)s
 autostart=true
