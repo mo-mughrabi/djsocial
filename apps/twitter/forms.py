@@ -27,6 +27,15 @@ class OrderTypeForm(forms.Form):
         kwargs.pop('user')
         super(OrderTypeForm, self).__init__(*args, **kwargs)
 
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        scheduled_orders_count = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=self.user),
+            run_once=False).count()
+        MAX_SCHEDULED_ORDERS_PER_USER = getattr(settings, 'MAX_SCHEDULED_ORDERS_PER_USER', 5)
+        if scheduled_orders_count >= MAX_SCHEDULED_ORDERS_PER_USER :
+            raise forms.ValidationError(_('No more than "{}" orders per user'.format(MAX_SCHEDULED_ORDERS_PER_USER)))
+        return cleaned_data
+
 
 class RelationshipForm(forms.ModelForm):
     """ RelationshipForm

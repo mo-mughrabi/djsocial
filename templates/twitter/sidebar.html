@@ -1,6 +1,6 @@
-{% load i18n %}
+{% load i18n utils %}
 <ul class="nav nav-pills nav-stacked">
-    <li class="active"><a href="{% url 'twitter-home' %}">{% trans 'Scheduled Tasks' %}</a></li>
-    <li><a href="{% url 'twitter-order-history' %}">{% trans 'Order history' %}</a></li>
-    <li><a href="{% url 'twitter-create-order' %}">{% trans 'Create order' %}</a></li>
+    <li class="{% if request|is_active:'twitter-home' %}active{% endif %}"><a href="{% url 'twitter-home' %}">{% trans 'Scheduled Tasks' %}</a></li>
+    <li class="{% if request|is_active:'twitter-order-history' %}active{% endif %}"><a href="{% url 'twitter-order-history' %}">{% trans 'Order history' %}</a></li>
+    <li><a href="{% url 'twitter-create-order' %}">{% trans 'Create order' %} {{ scheduled_orders_list.count }}</a></li>
 </ul>
