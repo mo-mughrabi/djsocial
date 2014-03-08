@@ -26,6 +26,7 @@ Second step is to clone the project and install the requirements
     3) python manage.py resetdb
 
 The last commands loads fixture data for groups and the admin user.
+
 To change the admin password use the following command in the django shell:
     
     >>> admin = User.objects.get(id=1)
@@ -33,12 +34,14 @@ To change the admin password use the following command in the django shell:
     >>> admin.save()
     
 Note that you need to edit the file  settings/local_env.py with :
+
     * Database credentials
     * Twitter app cosumer key and secret
     * Amazon access Key and Secret
     
 Contributors
 -----
+
     * Mo Mughrabi - Lead developer
     * Ahmed Elhamidi
     * Mariusz Kosakowski - Developer
