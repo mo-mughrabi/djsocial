@@ -38,3 +38,4 @@ storage==0.0.5a2
 update-checker==0.6
 wsgiref==0.1.2
 yolk==0.4.3
+markdown==2.4
