@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import glob
-from django.core.management.base import BaseCommand, CommandError
-from django.db import connections, connection
 import os
+
+from django.core.management.base import BaseCommand, CommandError
+from django.db import connection
 from django.db.models import get_apps
 
 

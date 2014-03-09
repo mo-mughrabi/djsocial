@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
+
 from django import forms
-from django.core.urlresolvers import reverse
 from django.template.defaultfilters import safe
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext_lazy as _
+
 from apps.account.models import User
 
 

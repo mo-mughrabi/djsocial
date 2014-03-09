@@ -10,6 +10,7 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardi
 def base(f=''):
     return os.path.join(BASE_DIR, f)
 
+
 sys.path.insert(0, base('plugins'))
 
 DEBUG = True
@@ -97,7 +98,6 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
     #     'django.template.loaders.eggs.Loader',
 )
-
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -228,11 +228,9 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 # for django-orm-extensions to not conflict with south
 SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
 
-
 LOGIN_ERROR_URL = '/account/error/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/'
-
 
 MAX_SCHEDULED_ORDERS_PER_USER = 5
 
@@ -244,7 +242,7 @@ try:
     AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
     AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
     STATICFILES_STORAGE = 'storage.S3StaticBucket'
-except :
+except:
     pass
 
 

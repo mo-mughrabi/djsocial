@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from binascii import hexlify
-from django.db.models.signals import post_syncdb
 import os
 import random
 import re
 import datetime
 import string
+
 from django.conf import settings
 from django.contrib.auth.models import BaseUserManager, PermissionsMixin, AbstractBaseUser, Group
 from django.core import validators

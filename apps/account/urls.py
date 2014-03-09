@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 from django.conf.urls import patterns, url, include
+
 from views import Signup, Logout, Error, Verify, SocialRegister, Profile, DeleteProfileView
+
 
 urlpatterns = patterns('',
                        url(r'^sign-up/$', Signup.as_view(), name='account-signup'),

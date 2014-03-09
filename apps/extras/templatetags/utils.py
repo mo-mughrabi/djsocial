@@ -11,6 +11,7 @@ def dict_key_lookup(the_dict, key):
     # Try to fetch from the dict, and if it's not found return an empty string.
     return the_dict.get(key, '')
 
+
 @register.filter
 def is_active(request, url):
     """ """

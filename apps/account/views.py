@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponse
-from django.shortcuts import render, get_object_or_404, redirect
+from django.http import Http404
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
-from django.views.generic.base import View, TemplateResponseMixin
+from django.views.generic.base import View
 from django.contrib.auth import logout as django_logout
-from forms import SocialForm, EditProfileForm
-from models import EmailConfirmation, User
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.views.generic import DeleteView
+
+from forms import SocialForm, EditProfileForm
+from models import EmailConfirmation, User
 
 
 class Signup(View):
@@ -36,10 +38,12 @@ class Logout(View):
         django_logout(request)
         return redirect(reverse('home'))
 
+
 class Error(View):
     """
 
     """
+
     def get(self, request):
         messages.error(request, _('Login Error'))
         return redirect(reverse('home'))

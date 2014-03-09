@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import logging
+
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.contrib import messages
@@ -11,8 +12,10 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from social_auth.db.django_models import UserSocialAuth
 from social_auth.exceptions import AuthAlreadyAssociated
+
 from exceptions import AuthAccountSuspended
 from models import User, EmailConfirmation
+
 
 # initiate logger
 logger = logging.getLogger('%s.%s.%s' % (getattr(settings, 'PACKAGE_NAMESPACE'), 'apps', __name__))
