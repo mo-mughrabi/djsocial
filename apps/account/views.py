@@ -36,6 +36,14 @@ class Logout(View):
         django_logout(request)
         return redirect(reverse('home'))
 
+class Error(View):
+    """
+
+    """
+    def get(self, request):
+        messages.error(request, _('Login Error'))
+        return redirect(reverse('home'))
+
 
 class Verify(View):
     """
