@@ -141,6 +141,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def display_name(self):
         return u'%s' % self.full_name
 
+    def get_short_name(self):
+        return u'%s' % self.full_name
+
     @property
     def email_validity(self):
         return self.is_email_valid[0]
