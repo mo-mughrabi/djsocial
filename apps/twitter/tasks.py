@@ -9,12 +9,12 @@ from celery.utils.log import get_task_logger
 from django.db.models import Q, Count
 from pytz import utc
 from django.utils import timezone
+from djorm_hstore.expressions import HstoreExpression as HE
 
 from apps.twitter.models import Order, ScheduleOrder
 import tweepy
 from tweepy import OAuthHandler, Cursor
 from models import Twitter
-from djorm_hstore.expressions import HstoreExpression as HE
 
 
 # setup logger

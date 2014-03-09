@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import os
+
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.template import RequestContext
-from forms import OrderTypeForm, RelationshipForm, AutoTweetForm, AutoTweetSearchForm, AutoTweetUserForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.formtools.wizard.views import SessionWizardView
+
+from forms import OrderTypeForm, RelationshipForm, AutoTweetForm, AutoTweetSearchForm, AutoTweetUserForm
 from apps.twitter.models import Twitter
+
 
 FORMS = [("order_step", OrderTypeForm),
          ("relationship_step", RelationshipForm),

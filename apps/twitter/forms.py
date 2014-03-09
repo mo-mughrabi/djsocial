@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 from django import forms
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-import re
+
 from tweepy import OAuthHandler
 import tweepy
 from models import ScheduleOrder, Twitter
@@ -30,9 +31,9 @@ class OrderTypeForm(forms.Form):
     def clean(self):
         cleaned_data = self.cleaned_data
         scheduled_orders_count = ScheduleOrder.objects.filter(user=get_object_or_404(Twitter, user=self.user),
-            run_once=False).count()
+                                                              run_once=False).count()
         MAX_SCHEDULED_ORDERS_PER_USER = getattr(settings, 'MAX_SCHEDULED_ORDERS_PER_USER', 5)
-        if scheduled_orders_count >= MAX_SCHEDULED_ORDERS_PER_USER :
+        if scheduled_orders_count >= MAX_SCHEDULED_ORDERS_PER_USER:
             raise forms.ValidationError(_('No more than "{}" orders per user'.format(MAX_SCHEDULED_ORDERS_PER_USER)))
         return cleaned_data
 

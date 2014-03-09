@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 from django.conf import settings
 from django.db import models
 from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from djorm_hstore.fields import DictionaryField
 from djorm_pgarray.fields import ArrayField
-from jsonfield import JSONField
-from tweepy import OAuthHandler
-import tweepy
+
 from managers import TwitterManager, ScheduleOrderManger, OrderManager
 
 
