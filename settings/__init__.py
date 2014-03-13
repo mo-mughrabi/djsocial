@@ -140,7 +140,6 @@ INSTALLED_APPS = (
     'storages',
     'south',
     'social_auth',
-    'django_ses',
     'djcelery',
     'apps.extras',
     'apps.account',
