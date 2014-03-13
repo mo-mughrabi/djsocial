@@ -31,15 +31,26 @@
         <hr>
 
         <section id="main_content">
-          <h3>
-<a name="welcome-djsocial" class="anchor" href="#welcome-djsocial"><span class="octicon octicon-link"></span></a>Welcome DjSocial</h3>
+          <h2>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h2>
 
-<p>djsocial was developed as initiative to create a robotic web based solution for social media, starting with twitter and expanding later to other channels. Unfortunately, investment was cut off and project decided to be discontinued, so we moved the project to the open source arena. </p>
+<p>djsocial was developed as initiative to create a robotic web based solution for social media, starting with twitter
+and expanding later to other channels. Unfortunately, investment was cut off and project decided to be discontinued,
+so we moved the project to the open source arena.</p>
 
-<p>We will continue to support it if any issue arises and we will work on a roadmap to build further features and integration with other social channels in the next period. </p>
+<p>We will continue to support it if any issue arises and we will work on a roadmap to build further features and
+integration with other social channels in the next period.</p>
 
-<h3>
-<a name="setup--installation" class="anchor" href="#setup--installation"><span class="octicon octicon-link"></span></a>Setup &amp; Installation</h3>
+<p>At the moment, djsocial is built with twitter integration. With the following functionality</p>
+
+<pre><code>1) Auto follow certain hashtags
+2) Auto favorite certain hashtags
+3) Auto follow back
+4) Auto unfollow backard
+</code></pre>
+
+<h2>
+<a name="setup-and-installation" class="anchor" href="#setup-and-installation"><span class="octicon octicon-link"></span></a>Setup and Installation</h2>
 
 <p>The solution will only work on <em>postgresql</em> databases, since we are heavily using hstore dictionary fields in our
 model design.</p>
@@ -70,14 +81,13 @@ python manage.py resetdb
 <pre><code>&gt;&gt;&gt; python manage.py celery worker -Q djsocial -B -E --loglevel=INFO
 </code></pre>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<h2>
+<a name="contributors" class="anchor" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors</h2>
 
-<ul>
-<li>Mo Mughrabi - Lead developer</li>
-<li>Ahmed Elhamidi - Developer</li>
-<li>Mariusz Kosakowski - Developer</li>
-</ul>
+<pre><code>* Mo Mughrabi - Lead developer
+* Ahmed Elhamidi - Developer
+* Mariusz Kosakowski - Developer
+</code></pre>
         </section>
 
         <footer>
