@@ -10,6 +10,7 @@ DATABASES = {
     }
 }
 
+# for use with authentication
 TWITTER_CONSUMER_KEY = ''
 TWITTER_CONSUMER_SECRET = ''
 

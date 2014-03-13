@@ -8,7 +8,6 @@ social integration
     2) Auto favorite certain hashtags
     3) Auto follow back
     4) Auto unfollow backard
-    5) Schedule tweets
 
 
 Setup and Installation
