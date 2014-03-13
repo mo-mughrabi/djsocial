@@ -237,19 +237,7 @@ SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
 MAX_SCHEDULED_ORDERS_PER_USER = 5
 
-# email settings - django-ses
-EMAIL_BACKEND = 'django_ses.SESBackend'
-
-try:
-    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STATIC_STORAGE_BUCKET_NAME']
-    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
-    STATICFILES_STORAGE = 'storage.S3StaticBucket'
-except:
-    pass
-
-
-# bootup celery
+# boot-up celery
 # Celery
 import djcelery
 

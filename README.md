@@ -13,36 +13,29 @@ social integration
 Setup and Installation
 -----
 
-First step is to creare a postresql database and create a virtual environment with :
+The solution will only work on *postgresql* databases, since we are heavily using hstore dictionary fields in our
+model design.
 
-```
->>> virtualenv djsocial_env
-```
+to begin clone the project and install the requirements
 
-Second step is to clone the project and install the requirements
-
-    1) git clone git@github.com:mo-mughrabi/djsocial.git
-    2) pip install -r requirements.txt
-    3) cp settings/development.py settings/local_env.py
-    3) python manage.py resetdb
+    git clone git@github.com:mo-mughrabi/djsocial.git
+    pip install -r requirements.txt
+    cp settings/development.py settings/local_env.py
+    python manage.py resetdb
 
 The last commands loads fixture data for groups and the admin user.
 
-To change the admin password use the following command in the django shell:
+To change the admin password use the following command:
 
 ```
->>> admin = User.objects.get(id=1)
->>> admin.setpassword("new_password")
->>> admin.save()
+>>> python manage.py changepassword admin
 ```
     
 Note that you need to edit the file  settings/local_env.py with :
 
     * Database credentials
     * Twitter app cosumer key and secret
-    * Amazon access Key and Secret
 
-=======
 
 To execute scheduled tasks, celery needs to be running (rabbitmq required):
 

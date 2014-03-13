@@ -13,7 +13,3 @@ DATABASES = {
 # for use with authentication
 TWITTER_CONSUMER_KEY = ''
 TWITTER_CONSUMER_SECRET = ''
-
-# mainly for use with django-ses
-AWS_ACCESS_KEY_ID = ''
-AWS_SECRET_ACCESS_KEY = ''

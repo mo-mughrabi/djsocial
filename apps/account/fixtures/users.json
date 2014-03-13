@@ -3,7 +3,7 @@
         "pk": 1,
         "model": "account.user",
         "fields": {
-            "username": "mo",
+            "username": "admin",
             "date_of_birth": null,
             "groups": [2],
             "join_mailing_list": false,
@@ -14,8 +14,8 @@
             "full_name": "",
             "gender": null,
             "user_permissions": [],
-            "password": "pbkdf2_sha256$10000$UUz5QCQikRTa$uv19EOAhOomasyKkIDTrG/3dF1m4L5+JhRqz64+1FlU=",
-            "email": "mo.mughrabi@gmail.com",
+            "password": "",
+            "email": "admin@root",
             "date_joined": "2013-10-03T21:42:46.159Z"
         }
     }
