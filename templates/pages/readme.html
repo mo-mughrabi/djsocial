@@ -1,37 +1,50 @@
-<h2>Introduction</h2>
-<p>djsocial is an opensource software. Planned to launch for twitter and as demand increase both functionality and
-social integration</p>
+<h3>Introduction</h3>
+<p>djsocial was developed as initiative to create a robotic web based solution for social media, starting with twitter
+and expanding later to other channels. Unfortunately, investment was cut off and project decided to be discontinued,
+so we moved the project to the open source arena.</p>
+<p>We will continue to support it if any issue arises and we will work on a roadmap to build further features and
+integration with other social channels in the next period.</p>
+<p>At the moment, djsocial is built with twitter integration. With the following functionality</p>
 <pre><code>1) Auto follow certain hashtags
 2) Auto favorite certain hashtags
 3) Auto follow back
 4) Auto unfollow backard
-5) Schedule tweets
 </code></pre>
-<h2>Setup and Installation</h2>
-<p>First step is to creare a postresql database and create a virtual environment with :</p>
-<pre><code>&gt;&gt;&gt; virtualenv djsocial_env
-</code></pre>
-<p>Second step is to clone the project and install the requirements</p>
-<pre><code>1) git clone git@github.com:mo-mughrabi/djsocial.git
-2) pip install -r requirements.txt
-3) cp settings/development.py settings/local_env.py
-3) python manage.py resetdb
+<h3>Setup and Installation</h3>
+<p>The solution will only work on <em>postgresql</em> databases, since we are heavily using hstore dictionary fields in our
+model design.</p>
+<p>to begin clone the project and install the requirements</p>
+<pre><code>git clone git@github.com:mo-mughrabi/djsocial.git
+pip install -r requirements.txt
+cp settings/development.py settings/local_env.py
+python manage.py resetdb
 </code></pre>
 <p>The last commands loads fixture data for groups and the admin user.</p>
-<p>To change the admin password use the following command in the django shell:</p>
-<pre><code>&gt;&gt;&gt; admin = User.objects.get(id=1)
-&gt;&gt;&gt; admin.setpassword("new_password")
-&gt;&gt;&gt; admin.save()
-</code></pre>
+<p>To change the admin password use the following command:</p>
+<p>```</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>python manage.py changepassword admin
+```</p>
+</blockquote>
+</blockquote>
+</blockquote>
 <p>Note that you need to edit the file  settings/local_env.py with :</p>
 <pre><code>* Database credentials
 * Twitter app cosumer key and secret
-* Amazon access Key and Secret
 </code></pre>
-<p>=======</p>
-<p>To execute scheduled tasks, celery needs to be running (rabbitmq required):
-    &gt;&gt;&gt; python manage.py celery worker -Q djsocial -B -E --loglevel=INFO</p>
-<h2>Contributors</h2>
+<p>To execute scheduled tasks, celery needs to be running (rabbitmq required):</p>
+<p>```</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>python manage.py celery worker -Q djsocial -B -E --loglevel=INFO
+```</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<h3>Contributors</h3>
 <pre><code>* Mo Mughrabi - Lead developer
 * Ahmed Elhamidi - Developer
 * Mariusz Kosakowski - Developer
