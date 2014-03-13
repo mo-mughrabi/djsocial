@@ -1,3 +1,6 @@
+"""
+    storage.py can be used with amazon S3 storage, it helps in separating between public assets and public media
+"""
 from __future__ import absolute_import
 from django.conf import settings
 from storages.backends.s3boto import S3BotoStorage
