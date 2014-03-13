@@ -1,8 +1,14 @@
 Introduction
 -----
 
-djsocial is an opensource software. Planned to launch for twitter and as demand increase both functionality and
-social integration
+djsocial was developed as initiative to create a robotic web based solution for social media, starting with twitter
+and expanding later to other channels. Unfortunately, investment was cut off and project decided to be discontinued,
+so we moved the project to the open source arena.
+
+We will continue to support it if any issue arises and we will work on a roadmap to build further features and
+integration with other social channels in the next period.
+
+At the moment, djsocial is built with twitter integration. With the following functionality
 
     1) Auto follow certain hashtags
     2) Auto favorite certain hashtags
