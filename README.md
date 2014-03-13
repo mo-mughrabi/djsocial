@@ -1,5 +1,4 @@
-Introduction
------
+###Introduction
 
 djsocial was developed as initiative to create a robotic web based solution for social media, starting with twitter
 and expanding later to other channels. Unfortunately, investment was cut off and project decided to be discontinued,
@@ -16,8 +15,7 @@ At the moment, djsocial is built with twitter integration. With the following fu
     4) Auto unfollow backard
 
 
-Setup and Installation
------
+###Setup and Installation
 
 The solution will only work on *postgresql* databases, since we are heavily using hstore dictionary fields in our
 model design.
@@ -50,8 +48,7 @@ To execute scheduled tasks, celery needs to be running (rabbitmq required):
 ```
 
     
-Contributors
------
+###Contributors
 
     * Mo Mughrabi - Lead developer
     * Ahmed Elhamidi - Developer
