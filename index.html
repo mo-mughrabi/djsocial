@@ -41,33 +41,33 @@
 <h3>
 <a name="setup--installation" class="anchor" href="#setup--installation"><span class="octicon octicon-link"></span></a>Setup &amp; Installation</h3>
 
-<p>First step is to create a postresql database and create a virtual environment with :</p>
+<p>The solution will only work on <em>postgresql</em> databases, since we are heavily using hstore dictionary fields in our
+model design.</p>
 
-<pre><code>&gt;&gt;&gt; virtualenv djsocial_env
-</code></pre>
+<p>to begin clone the project and install the requirements</p>
 
-<p>Second step is to clone the project and install the requirements</p>
-
-<pre><code>1) git clone git@github.com:mo-mughrabi/djsocial.git
-2) pip install -r requirements.txt
-3) cp settings/development.py settings/local_env.py
-3) python manage.py resetdb
+<pre><code>git clone git@github.com:mo-mughrabi/djsocial.git
+pip install -r requirements.txt
+cp settings/development.py settings/local_env.py
+python manage.py resetdb
 </code></pre>
 
 <p>The last commands loads fixture data for groups and the admin user.</p>
 
-<p>To change the admin password use the following command in the django shell:</p>
+<p>To change the admin password use the following command:</p>
 
-<pre><code>&gt;&gt;&gt; admin = User.objects.get(id=1)
-&gt;&gt;&gt; admin.setpassword("new_password")
-&gt;&gt;&gt; admin.save()
+<pre><code>&gt;&gt;&gt; python manage.py changepassword admin
 </code></pre>
 
-<p>Note that you need to edit the file settings/local_env.py with:</p>
+<p>Note that you need to edit the file  settings/local_env.py with :</p>
 
 <pre><code>* Database credentials
 * Twitter app cosumer key and secret
-* Amazon access Key and Secret
+</code></pre>
+
+<p>To execute scheduled tasks, celery needs to be running (rabbitmq required):</p>
+
+<pre><code>&gt;&gt;&gt; python manage.py celery worker -Q djsocial -B -E --loglevel=INFO
 </code></pre>
 
 <h3>
